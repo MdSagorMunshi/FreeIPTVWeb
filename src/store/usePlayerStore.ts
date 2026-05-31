@@ -45,6 +45,10 @@ interface PlayerState {
   uploadedPlaylists: UploadedPlaylistMeta[];
   addUploadedPlaylist: (meta: UploadedPlaylistMeta) => void;
   removeUploadedPlaylist: (id: string) => void;
+
+  // Terms
+  hasAcceptedTerms: boolean;
+  setHasAcceptedTerms: (accepted: boolean) => void;
 }
 
 export const usePlayerStore = create<PlayerState>()(
@@ -60,7 +64,10 @@ export const usePlayerStore = create<PlayerState>()(
   worldSearchQuery: '',
   worldSelectedGroup: 'All',
   uploadedPlaylists: [],
+  hasAcceptedTerms: false,
   
+  setHasAcceptedTerms: (accepted) => set({ hasAcceptedTerms: accepted }),
+
   addUploadedPlaylist: (meta) => set((state) => ({ uploadedPlaylists: [...state.uploadedPlaylists, meta] })),
   removeUploadedPlaylist: (id) => set((state) => ({ uploadedPlaylists: state.uploadedPlaylists.filter(p => p.id !== id) })),
   
@@ -103,7 +110,12 @@ export const usePlayerStore = create<PlayerState>()(
 }),
 {
   name: 'free-iptv-storage',
-  partialize: (state) => ({ favorites: state.favorites, settings: state.settings, uploadedPlaylists: state.uploadedPlaylists }),
+  partialize: (state) => ({ 
+    favorites: state.favorites, 
+    settings: state.settings, 
+    uploadedPlaylists: state.uploadedPlaylists,
+    hasAcceptedTerms: state.hasAcceptedTerms
+  }),
 }
   )
 );
