@@ -167,12 +167,15 @@ function ControlsOverlay({
 /*                                HLS.js ENGINE                               */
 /* -------------------------------------------------------------------------- */
 function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
-  const { settings } = usePlayerStore();
+  const { settings, updateSettings } = usePlayerStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const volume = settings.volume ?? 1;
+  const isMuted = settings.isMuted ?? false;
+  const setVolume = (val: number) => updateSettings({ volume: val });
+  const setIsMuted = (muted: boolean) => updateSettings({ isMuted: muted });
+
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
   
@@ -188,6 +191,9 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
     let hls: Hls | null = null;
 
     setIsBuffering(true); setShowVpnPopup(false); setIsPlaying(false); setShowSettings(false); setQualities([]); setCurrentQuality(-1);
+    
+    video.volume = settings.volume ?? 1;
+    video.muted = settings.isMuted ?? false;
     
     if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
     loadingTimeoutRef.current = setTimeout(() => { if (isBuffering || !isPlaying) setShowVpnPopup(true); }, 30000);
@@ -289,12 +295,15 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
 /*                            REACT-PLAYER ENGINE                             */
 /* -------------------------------------------------------------------------- */
 function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
-  const { settings } = usePlayerStore();
+  const { settings, updateSettings } = usePlayerStore();
   const playerRef = useRef<any>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const volume = settings.volume ?? 1;
+  const isMuted = settings.isMuted ?? false;
+  const setVolume = (val: number) => updateSettings({ volume: val });
+  const setIsMuted = (muted: boolean) => updateSettings({ isMuted: muted });
+
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
 
@@ -378,13 +387,16 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
 /*                              VIDEO.JS ENGINE                               */
 /* -------------------------------------------------------------------------- */
 function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
-  const { settings } = usePlayerStore();
+  const { settings, updateSettings } = usePlayerStore();
   const placeholderRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const volume = settings.volume ?? 1;
+  const isMuted = settings.isMuted ?? false;
+  const setVolume = (val: number) => updateSettings({ volume: val });
+  const setIsMuted = (muted: boolean) => updateSettings({ isMuted: muted });
+
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
 
@@ -410,6 +422,9 @@ function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFulls
     });
 
     const p = playerRef.current;
+    p.volume(settings.volume ?? 1);
+    p.muted(settings.isMuted ?? false);
+
     p.on('play', () => { setIsPlaying(true); setIsBuffering(false); });
     p.on('pause', () => setIsPlaying(false));
     p.on('waiting', () => setIsBuffering(true));

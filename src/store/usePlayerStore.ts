@@ -6,6 +6,8 @@ export interface AppSettings {
   engine: 'hls' | 'react-player' | 'videojs';
   theme: 'dark' | 'light' | 'oled';
   autoPlay: boolean;
+  volume: number;
+  isMuted: boolean;
 }
 
 export interface UploadedPlaylistMeta {
@@ -91,6 +93,8 @@ export const usePlayerStore = create<PlayerState>()(
     engine: 'hls',
     theme: 'dark',
     autoPlay: true,
+    volume: 1,
+    isMuted: false,
   },
   
   updateSettings: (newSettings) => set((state) => ({
