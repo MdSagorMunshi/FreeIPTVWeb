@@ -17,13 +17,18 @@ export default function World() {
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(60);
   const observer = useRef<IntersectionObserver | null>(null);
+  const fetchingRef = useRef(false);
 
   const observerTarget = useCallback((node: HTMLDivElement | null) => {
     if (observer.current) observer.current.disconnect();
     if (node) {
       observer.current = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount(prev => prev + 60);
+        if (entries[0].isIntersecting && !fetchingRef.current) {
+          fetchingRef.current = true;
+          setTimeout(() => {
+            setVisibleCount(prev => prev + 60);
+            fetchingRef.current = false;
+          }, 800);
         }
       }, { threshold: 0.1 });
       observer.current.observe(node);
