@@ -30,14 +30,26 @@ export function Player() {
       hls.loadSource(currentChannel.url);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(e => console.log("Auto-play prevented", e));
-        setIsPlaying(true);
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            setIsPlaying(true);
+          }).catch(e => {
+            console.log("Auto-play prevented or interrupted", e);
+          });
+        }
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = currentChannel.url;
       video.addEventListener("loadedmetadata", () => {
-        video.play().catch(e => console.log("Auto-play prevented", e));
-        setIsPlaying(true);
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            setIsPlaying(true);
+          }).catch(e => {
+            console.log("Auto-play prevented or interrupted", e);
+          });
+        }
       });
     }
 
@@ -49,9 +61,20 @@ export function Player() {
   const togglePlay = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (videoRef.current) {
-      if (isPlaying) videoRef.current.pause();
-      else videoRef.current.play();
-      setIsPlaying(!isPlaying);
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            setIsPlaying(true);
+          }).catch(e => {
+            console.log("Play interrupted", e);
+            setIsPlaying(false);
+          });
+        }
+      }
     }
   };
 

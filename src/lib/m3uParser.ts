@@ -18,7 +18,14 @@ export const parseM3U = (content: string): Playlist => {
       
       currentChannel.name = nameMatch ? nameMatch[1].trim() : 'Unknown Channel';
       currentChannel.logo = logoMatch ? logoMatch[1] : '';
-      currentChannel.group = groupMatch ? groupMatch[1] : 'Uncategorized';
+      let rawGroup = groupMatch ? groupMatch[1].trim() : 'Uncategorized';
+      rawGroup = rawGroup
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      
+      currentChannel.group = rawGroup;
       currentChannel.id = Math.random().toString(36).substr(2, 9);
       
       groups.add(currentChannel.group);

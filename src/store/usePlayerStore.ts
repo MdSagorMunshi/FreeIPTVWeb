@@ -3,28 +3,39 @@ import { Channel, Playlist } from '@/types';
 
 interface PlayerState {
   playlist: Playlist | null;
+  worldPlaylist: Playlist | null;
   currentChannel: Channel | null;
   isPlaying: boolean;
   favorites: Channel[];
   searchQuery: string;
   selectedGroup: string;
+  worldSearchQuery: string;
+  worldSelectedGroup: string;
   setPlaylist: (playlist: Playlist) => void;
+  setWorldPlaylist: (playlist: Playlist) => void;
   setCurrentChannel: (channel: Channel | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   toggleFavorite: (channel: Channel) => void;
   setSearchQuery: (query: string) => void;
   setSelectedGroup: (group: string) => void;
+  setWorldSearchQuery: (query: string) => void;
+  setWorldSelectedGroup: (group: string) => void;
 }
 
 export const usePlayerStore = create<PlayerState>((set) => ({
   playlist: null,
+  worldPlaylist: null,
   currentChannel: null,
   isPlaying: false,
   favorites: [],
   searchQuery: '',
   selectedGroup: 'All',
+  worldSearchQuery: '',
+  worldSelectedGroup: 'All',
   
   setPlaylist: (playlist) => set({ playlist }),
+  
+  setWorldPlaylist: (playlist) => set({ worldPlaylist: playlist }),
   
   setCurrentChannel: (channel) => set({ currentChannel: channel, isPlaying: !!channel }),
   
@@ -42,4 +53,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
   
   setSelectedGroup: (group) => set({ selectedGroup: group }),
+  
+  setWorldSearchQuery: (query) => set({ worldSearchQuery: query }),
+  
+  setWorldSelectedGroup: (group) => set({ worldSelectedGroup: group }),
 }));
