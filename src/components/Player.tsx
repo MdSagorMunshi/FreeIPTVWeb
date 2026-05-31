@@ -202,7 +202,7 @@ export function Player() {
                 <ShieldAlert size={40} className="text-red-500 mx-auto mb-3" />
                 <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Stream Blocked?</h3>
                 <p className="text-zinc-400 text-xs sm:text-sm mb-4 leading-relaxed">
-                  This channel took too long to load. Your ISP might be blocking it. We recommend using a free encrypted VPN:
+                  This channel took too long to load. Your ISP might be blocking it, or the TV server may not support your country. We recommend using a free encrypted VPN to bypass this:
                 </p>
                 <div className="flex flex-col gap-2 mb-5">
                   <a href="https://1.1.1.1/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-white/5 hover:bg-white/10 p-2 sm:p-3 rounded-xl text-blue-400 font-semibold text-xs sm:text-sm transition-colors border border-white/5 hover:border-blue-500/30">
