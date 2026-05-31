@@ -9,6 +9,17 @@ export default function About() {
 
   const changelogs = [
     {
+      version: "v1.2.0",
+      date: "May 2026",
+      changes: [
+        "Overhauled mini-player: draggable picture-in-picture, volume slider, and functional stream quality controls",
+        "Introduced smooth infinite scrolling with 800ms natural lazy-loading",
+        "Redesigned all loading spinners into custom animated TV-signal equalizers",
+        "Added intelligent category counters and dynamic search totals across all pages",
+        "Imported official FreeIPTV branding and custom favicons"
+      ]
+    },
+    {
       version: "v1.1.0",
       date: "May 2026",
       changes: [
@@ -57,7 +68,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-8">
             <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-4 flex flex-col items-center">
               <h3 className="font-bold text-white mb-1">Version</h3>
-              <p className="text-purple-400 font-mono">1.1.0-web</p>
+              <p className="text-purple-400 font-mono">1.2.0-web</p>
             </div>
             <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-4 flex flex-col items-center">
               <h3 className="font-bold text-white mb-1">Engine</h3>
