@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
@@ -14,10 +14,19 @@ export function Player() {
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isBuffering, setIsBuffering] = useState(false);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
+  
+  // Settings State
+  const [showSettings, setShowSettings] = useState(false);
+  const hlsRef = useRef<Hls | null>(null);
+  const [qualities, setQualities] = useState<any[]>([]);
+  const [currentQuality, setCurrentQuality] = useState<number>(-1);
   
   const hideControlsTimeout = useRef<NodeJS.Timeout>(null);
   const loadingTimeoutRef = useRef<NodeJS.Timeout>(null);
@@ -32,6 +41,9 @@ export function Player() {
     setIsBuffering(true);
     setShowVpnPopup(false);
     setIsPlaying(false);
+    setShowSettings(false);
+    setQualities([]);
+    setCurrentQuality(-1);
     
     // Clear any existing timeouts
     if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
@@ -62,9 +74,18 @@ export function Player() {
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
       });
+      hlsRef.current = hls;
+      
       hls.loadSource(currentChannel.url);
       hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      
+      hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        const uniqueQualities = data.levels.filter((l, i, self) => 
+          i === self.findIndex((t) => t.height === l.height)
+        );
+        setQualities(uniqueQualities);
+        setCurrentQuality(hls!.currentLevel);
+        
         const playPromise = video.play();
         if (playPromise !== undefined) {
           playPromise.catch(e => {
@@ -72,6 +93,11 @@ export function Player() {
           });
         }
       });
+      
+      hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+        setCurrentQuality(data.level);
+      });
+
       hls.on(Hls.Events.ERROR, (event, data) => {
         if (data.fatal) {
           setShowVpnPopup(true);
@@ -91,6 +117,7 @@ export function Player() {
 
     return () => {
       if (hls) hls.destroy();
+      hlsRef.current = null;
       if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('playing', handlePlaying);
@@ -121,8 +148,13 @@ export function Player() {
   const toggleMute = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+      const newMuteState = !isMuted;
+      videoRef.current.muted = newMuteState;
+      setIsMuted(newMuteState);
+      if (!newMuteState && volume === 0) {
+        setVolume(1);
+        videoRef.current.volume = 1;
+      }
     }
   };
 
@@ -145,7 +177,7 @@ export function Player() {
     setShowControls(true);
     if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
     hideControlsTimeout.current = setTimeout(() => {
-      if (isPlaying && !showVpnPopup) setShowControls(false);
+      if (isPlaying && !showVpnPopup && !showSettings && !showVolumeSlider) setShowControls(false);
     }, 3000);
   };
 
@@ -173,13 +205,18 @@ export function Player() {
         }`}
         ref={containerRef}
         onMouseMove={handleMouseMove}
-        onMouseLeave={() => (isPlaying && !showVpnPopup) && setShowControls(false)}
+        onMouseLeave={() => {
+          if (isPlaying && !showVpnPopup && !showSettings && !showVolumeSlider) setShowControls(false);
+        }}
         onClick={handleMouseMove}
       >
         <video
           ref={videoRef}
           className="w-full h-full object-contain bg-black cursor-pointer"
-          onClick={togglePlay}
+          onClick={() => {
+            if (showSettings) setShowSettings(false);
+            else togglePlay();
+          }}
           playsInline
         />
 
@@ -231,7 +268,7 @@ export function Player() {
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowVpnPopup(false);
-                    setIsBuffering(false); // allow them to still see UI or try playing again
+                    setIsBuffering(false);
                   }} 
                   className="w-full py-2.5 sm:py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors"
                 >
@@ -249,15 +286,15 @@ export function Player() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/60 flex flex-col justify-between p-4 sm:p-6 pointer-events-none z-20"
+              className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/60 flex flex-col justify-between p-3 sm:p-4 pointer-events-none z-20"
             >
               {/* Header */}
               <div className="flex items-center justify-between pointer-events-auto">
-                <div className="flex items-center gap-3 bg-black/60 backdrop-blur-xl px-4 py-2 rounded-2xl border border-white/10 shadow-lg">
+                <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
                   {currentChannel.logo && (
-                    <img src={currentChannel.logo} alt="" className="h-8 w-8 object-contain rounded-md" />
+                    <img src={currentChannel.logo} alt="" className="h-6 w-6 object-contain rounded-md" />
                   )}
-                  <span className="text-white font-bold text-sm sm:text-base lg:text-lg truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[300px]">
+                  <span className="text-white font-bold text-xs sm:text-sm truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[300px]">
                     {currentChannel.name}
                   </span>
                 </div>
@@ -267,9 +304,9 @@ export function Player() {
                       e.stopPropagation();
                       setCurrentChannel(null);
                     }}
-                    className="p-2 sm:p-3 bg-black/60 backdrop-blur-xl rounded-full text-white/70 hover:text-white hover:bg-white/10 border border-white/10 transition-all shadow-lg"
+                    className="p-1.5 sm:p-2 bg-black/60 backdrop-blur-xl rounded-full text-white/70 hover:text-white hover:bg-white/10 border border-white/10 transition-all shadow-lg"
                   >
-                    <X size={20} />
+                    <X size={16} />
                   </button>
                 )}
               </div>
@@ -277,41 +314,126 @@ export function Player() {
               {/* Center Play Button Overlay for Mobile */}
               {!isPlaying && !isBuffering && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-600/80 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_0_40px_rgba(147,51,234,0.5)]">
-                    <Play size={32} fill="currentColor" className="ml-2" />
+                  <div className="w-16 h-16 bg-purple-600/80 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_0_40px_rgba(147,51,234,0.5)]">
+                    <Play size={24} fill="currentColor" className="ml-1" />
                   </div>
                 </div>
               )}
 
               {/* Controls */}
               <div className="flex items-center justify-between mt-auto pointer-events-auto">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <button 
-                    onClick={togglePlay}
-                    className="p-3 sm:p-4 bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50"
-                    disabled={isBuffering}
-                  >
-                    {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
-                  </button>
-                  <button 
-                    onClick={toggleMute}
-                    className="p-3 sm:p-4 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5"
-                  >
-                    {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-                  </button>
-                </div>
-                
                 <div className="flex items-center gap-2">
                   <button 
-                    className="hidden sm:block p-3 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5"
+                    onClick={togglePlay}
+                    className="p-2 sm:p-2.5 bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50"
+                    disabled={isBuffering}
                   >
-                    <Settings size={22} />
+                    {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
                   </button>
+                  
+                  {/* Volume Control */}
+                  <div 
+                    className="flex items-center relative group"
+                    onMouseEnter={() => setShowVolumeSlider(true)}
+                    onMouseLeave={() => setShowVolumeSlider(false)}
+                  >
+                    <button 
+                      onClick={toggleMute}
+                      className="p-2 sm:p-2.5 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5"
+                    >
+                      {volume === 0 || isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showVolumeSlider && (
+                        <motion.div 
+                          initial={{ width: 0, opacity: 0, marginLeft: 0 }}
+                          animate={{ width: 80, opacity: 1, marginLeft: 8 }}
+                          exit={{ width: 0, opacity: 0, marginLeft: 0 }}
+                          className="overflow-hidden flex items-center bg-black/40 backdrop-blur-md rounded-full px-2 h-9 border border-white/5"
+                        >
+                          <input 
+                            type="range" 
+                            min="0" max="1" step="0.05" 
+                            value={isMuted ? 0 : volume}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              setVolume(val);
+                              if(videoRef.current) videoRef.current.volume = val;
+                              if(val > 0 && isMuted) setIsMuted(false);
+                              if(val === 0) setIsMuted(true);
+                            }}
+                            className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 relative">
+                  {/* Settings Button & Menu */}
+                  <div className="relative">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSettings(!showSettings);
+                      }}
+                      className={`p-2 sm:p-2.5 rounded-full transition-colors backdrop-blur-md border border-white/5 ${showSettings ? 'bg-white/30 text-white' : 'bg-black/40 text-white hover:bg-white/20'}`}
+                    >
+                      <Settings size={18} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showSettings && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute bottom-full right-0 mb-3 w-40 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden"
+                        >
+                          <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2">Quality</div>
+                          
+                          <button
+                            onClick={() => {
+                              if(hlsRef.current) hlsRef.current.currentLevel = -1;
+                              setCurrentQuality(-1);
+                              setShowSettings(false);
+                            }}
+                            className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold hover:bg-white/10 transition-colors text-white"
+                          >
+                            <span>Auto</span>
+                            {currentQuality === -1 && <Check size={14} className="text-purple-400" />}
+                          </button>
+                          
+                          {qualities.length === 0 && (
+                            <div className="px-3 py-2 text-xs text-zinc-500 italic">No alternative streams</div>
+                          )}
+                          
+                          {qualities.map((level, i) => (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                if(hlsRef.current) hlsRef.current.currentLevel = i;
+                                setCurrentQuality(i);
+                                setShowSettings(false);
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold hover:bg-white/10 transition-colors text-white"
+                            >
+                              <span>{level.height}p</span>
+                              {currentQuality === i && <Check size={14} className="text-purple-400" />}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
                   <button 
                     onClick={toggleFullscreen}
-                    className="p-3 sm:p-4 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5"
+                    className="p-2 sm:p-2.5 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5"
                   >
-                    {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+                    {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
                   </button>
                 </div>
               </div>
