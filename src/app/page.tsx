@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { parseM3U } from "@/lib/m3uParser";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Heart, Search } from "lucide-react";
+import { Play, Heart, Search, Loader2 } from "lucide-react";
 import { Player } from "@/components/Player";
 
 export default function Home() {
@@ -15,6 +15,20 @@ export default function Home() {
   } = usePlayerStore();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(60);
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const observerTarget = useCallback((node: HTMLDivElement | null) => {
+    if (observer.current) observer.current.disconnect();
+    if (node) {
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount(prev => prev + 60);
+        }
+      }, { threshold: 0.1 });
+      observer.current.observe(node);
+    }
+  }, []);
 
   useEffect(() => {
     const loadPlaylist = async () => {
@@ -37,11 +51,21 @@ export default function Home() {
     }
   }, [playlist, setPlaylist]);
 
-  const filteredChannels = playlist?.channels.filter(channel => {
-    const matchesGroup = selectedGroup === 'All' || channel.group === selectedGroup;
-    const matchesSearch = channel.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesGroup && matchesSearch;
-  }) || [];
+  const filteredChannels = useMemo(() => {
+    if (!playlist) return [];
+    return playlist.channels.filter(channel => {
+      const matchesGroup = selectedGroup === 'All' || channel.group === selectedGroup;
+      const matchesSearch = channel.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesGroup && matchesSearch;
+    });
+  }, [playlist, selectedGroup, searchQuery]);
+
+  const displayedChannels = filteredChannels.slice(0, visibleCount);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(60);
+  }, [selectedGroup, searchQuery]);
 
   if (isLoading) {
     return (
@@ -51,7 +75,7 @@ export default function Home() {
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           className="w-16 h-16 md:w-20 md:h-20 border-4 border-purple-500 border-t-transparent rounded-full shadow-[0_0_30px_rgba(168,85,247,0.4)]"
         />
-        <p className="mt-6 text-zinc-400 font-bold tracking-[0.2em] uppercase text-sm md:text-base">Loading Channels...</p>
+        <p className="mt-6 text-zinc-400 font-bold tracking-[0.2em] uppercase text-sm md:text-base">Initializing Core...</p>
       </div>
     );
   }
@@ -62,10 +86,10 @@ export default function Home() {
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-2 md:mb-4">
-            Discover <span className="text-gradient">Live TV</span>
+            Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Live TV</span>
           </h1>
           <p className="text-zinc-400 text-base md:text-lg lg:text-xl max-w-2xl">
-            Watch your favorite channels in stunning quality on any device.
+            Stream your favorite channels with unparalleled speed and a stunning, distraction-free interface.
           </p>
         </div>
 
@@ -76,7 +100,7 @@ export default function Home() {
           <input
             type="text"
             className="w-full pl-14 pr-6 py-4 md:py-5 text-base md:text-lg bg-zinc-900/50 border border-zinc-800 rounded-3xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all glass placeholder-zinc-500 text-white shadow-xl shadow-black/20"
-            placeholder="Search channels..."
+            placeholder="Search channels, movies, sports..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -113,7 +137,7 @@ export default function Home() {
       {/* Grid */}
       <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 [media(min-width:2000px)]:grid-cols-8 gap-4 sm:gap-6 md:gap-8">
         <AnimatePresence>
-          {filteredChannels.map((channel, idx) => {
+          {displayedChannels.map((channel, idx) => {
             const isPlaying = currentChannel?.id === channel.id;
             const isFav = favorites.some(c => c.id === channel.id);
 
@@ -123,7 +147,7 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.3, delay: Math.min(idx * 0.02, 0.2) }}
+                transition={{ duration: 0.3, delay: Math.min((idx % 60) * 0.02, 0.2) }}
                 key={channel.id}
                 className={`relative group rounded-3xl overflow-hidden glass-card cursor-pointer transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-purple-900/40 ${
                   isPlaying ? 'ring-4 ring-purple-500 shadow-2xl shadow-purple-900/50 -translate-y-2' : 'border border-white/5'
@@ -174,7 +198,13 @@ export default function Home() {
           })}
         </AnimatePresence>
       </motion.div>
-      
+
+      {filteredChannels.length > visibleCount && (
+        <div ref={observerTarget} className="flex justify-center pt-12 pb-8">
+          <Loader2 className="animate-spin text-purple-500/50" size={40} />
+        </div>
+      )}
+
       {filteredChannels.length === 0 && (
         <div className="flex flex-col items-center justify-center py-32 text-zinc-500">
           <Search size={64} className="mb-6 opacity-30" />
@@ -183,7 +213,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Floating Player */}
       <Player />
     </div>
   );

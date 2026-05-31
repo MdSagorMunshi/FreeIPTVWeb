@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { parseM3U } from "@/lib/m3uParser";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Heart, Search, Globe2, ChevronDown } from "lucide-react";
+import { Play, Heart, Search, Globe2, ChevronDown, Loader2 } from "lucide-react";
 import { Player } from "@/components/Player";
 
 export default function World() {
@@ -16,6 +16,19 @@ export default function World() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(60);
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const observerTarget = useCallback((node: HTMLDivElement | null) => {
+    if (observer.current) observer.current.disconnect();
+    if (node) {
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount(prev => prev + 60);
+        }
+      }, { threshold: 0.1 });
+      observer.current.observe(node);
+    }
+  }, []);
 
   useEffect(() => {
     const loadPlaylist = async () => {
@@ -188,13 +201,8 @@ export default function World() {
       </motion.div>
       
       {filteredChannels.length > visibleCount && (
-        <div className="flex justify-center pt-8 pb-4">
-          <button
-            onClick={() => setVisibleCount(prev => prev + 60)}
-            className="flex items-center gap-2 px-8 py-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold rounded-full transition-all border border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]"
-          >
-            Load More <ChevronDown size={20} />
-          </button>
+        <div ref={observerTarget} className="flex justify-center pt-12 pb-8">
+          <Loader2 className="animate-spin text-blue-500/50" size={40} />
         </div>
       )}
 
