@@ -1,14 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Settings as SettingsIcon, MonitorPlay, Zap, Palette, Moon, Sun, Smartphone } from "lucide-react";
+import { Settings as SettingsIcon, MonitorPlay, Zap, Palette, Moon, Sun, Smartphone, Globe } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useTheme } from "next-themes";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { useEffect, useState } from "react";
 
 export default function Settings() {
   const { settings, updateSettings } = usePlayerStore();
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,8 +30,8 @@ export default function Settings() {
             <SettingsIcon size={32} className="text-white" />
           </div>
           <div>
-            <h1 className="text-4xl font-black text-white">App Settings</h1>
-            <p className="text-zinc-400">Customize your viewing experience</p>
+            <h1 className="text-4xl font-black text-white">{t('settings.title')}</h1>
+            <p className="text-zinc-400">{t('settings.subtitle')}</p>
           </div>
         </div>
 
@@ -38,14 +40,15 @@ export default function Settings() {
           <section className="glass-card rounded-3xl p-6 md:p-8 border border-white/5 shadow-2xl shadow-purple-900/10">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
               <MonitorPlay className="text-purple-400" size={24} />
-              <h2 className="text-2xl font-bold text-white">Video Engine</h2>
+              <h2 className="text-2xl font-bold text-white">{t('settings.engine')}</h2>
             </div>
             
             <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-              Choose the underlying video player technology used to render live streams. Different engines may provide better stability depending on your device or the specific stream format.
+              {t('settings.engineDesc')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* ... engine buttons remain un-translated since they are proper nouns, but we'll translate the sub-descriptions if we had them. Let's just leave the buttons as is, they are proper nouns ... */}
               <button 
                 onClick={() => updateSettings({ engine: 'hls' })}
                 className={`relative flex flex-col items-start p-4 rounded-2xl border transition-all duration-300 overflow-hidden ${
@@ -59,9 +62,6 @@ export default function Settings() {
                 )}
                 <span className="font-bold text-white mb-1">HLS.js Core</span>
                 <span className="text-xs text-zinc-400 text-left">Custom FreeIPTV Engine. Highly optimized for web browsers.</span>
-                {settings.engine === 'hls' && (
-                  <span className="mt-3 text-[10px] uppercase tracking-widest font-bold text-purple-400 bg-purple-500/20 px-2 py-1 rounded-md">Active</span>
-                )}
               </button>
 
               <button 
@@ -77,9 +77,6 @@ export default function Settings() {
                 )}
                 <span className="font-bold text-white mb-1">ReactPlayer</span>
                 <span className="text-xs text-zinc-400 text-left">Universal player wrapper. Excellent fallback compatibility.</span>
-                {settings.engine === 'react-player' && (
-                  <span className="mt-3 text-[10px] uppercase tracking-widest font-bold text-blue-400 bg-blue-500/20 px-2 py-1 rounded-md">Active</span>
-                )}
               </button>
 
               <button 
@@ -95,11 +92,35 @@ export default function Settings() {
                 )}
                 <span className="font-bold text-white mb-1">Video.js</span>
                 <span className="text-xs text-zinc-400 text-left">Industry standard HTML5 video player framework.</span>
-                {settings.engine === 'videojs' && (
-                  <span className="mt-3 text-[10px] uppercase tracking-widest font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded-md">Active</span>
-                )}
               </button>
             </div>
+          </section>
+
+          {/* Language Settings */}
+          <section className="glass-card rounded-3xl p-6 md:p-8 border border-white/5">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+              <Globe className="text-blue-400" size={24} />
+              <h2 className="text-2xl font-bold text-white">{t('settings.language')}</h2>
+            </div>
+            
+            <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
+              {t('settings.languageDesc')}
+            </p>
+
+            <select 
+              value={settings.language || 'en'}
+              onChange={(e) => updateSettings({ language: e.target.value as any })}
+              className="w-full sm:w-1/2 p-3 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-purple-500 transition-colors"
+            >
+              <option value="en">English</option>
+              <option value="bn">Bengali (বাংলা)</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="ru">Russian (Русский)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="hi">Hindi (हिन्दी)</option>
+              <option value="ja">Japanese (日本語)</option>
+              <option value="zh">Chinese (中文)</option>
+            </select>
           </section>
 
           {/* Playback Settings */}
@@ -111,8 +132,8 @@ export default function Settings() {
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-white text-lg">Auto-Play Channels</h3>
-                <p className="text-zinc-400 text-sm">Automatically start playing stream when selecting a channel.</p>
+                <h3 className="font-bold text-white text-lg">{t('settings.autoplay')}</h3>
+                <p className="text-zinc-400 text-sm">{t('settings.autoplayDesc')}</p>
               </div>
               <button 
                 onClick={() => updateSettings({ autoPlay: !settings.autoPlay })}
@@ -133,11 +154,11 @@ export default function Settings() {
           <section className="glass-card rounded-3xl p-6 md:p-8 border border-white/5">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
               <Palette className="text-cyan-400" size={24} />
-              <h2 className="text-2xl font-bold text-white">Theme</h2>
+              <h2 className="text-2xl font-bold text-white">{t('settings.theme')}</h2>
             </div>
             
             <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-              Personalize the app's appearance. Pure OLED mode completely disables background illumination to save battery on OLED screens.
+              {t('settings.themeDesc')}
             </p>
 
             {mounted && (
@@ -159,7 +180,7 @@ export default function Settings() {
                   }`}
                 >
                   <Sun size={28} className={theme === 'light' ? 'text-yellow-400 mb-2' : 'text-zinc-400 mb-2'} />
-                  <span className="font-bold text-white text-sm">Light</span>
+                  <span className="font-bold text-white text-sm">{t('settings.theme.light')}</span>
                 </button>
 
                 <button 
@@ -169,7 +190,7 @@ export default function Settings() {
                   }`}
                 >
                   <Moon size={28} className={theme === 'dark' ? 'text-purple-400 mb-2' : 'text-zinc-400 mb-2'} />
-                  <span className="font-bold text-white text-sm">Dark</span>
+                  <span className="font-bold text-white text-sm">{t('settings.theme.dark')}</span>
                 </button>
 
                 <button 
@@ -179,7 +200,7 @@ export default function Settings() {
                   }`}
                 >
                   <div className="w-7 h-7 bg-black rounded-full border border-white/20 mb-2 shadow-inner" />
-                  <span className="font-bold text-white text-sm">Pure OLED</span>
+                  <span className="font-bold text-white text-sm">{t('settings.theme.oled')}</span>
                 </button>
               </div>
             )}

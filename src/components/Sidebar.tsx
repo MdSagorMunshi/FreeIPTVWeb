@@ -1,10 +1,11 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Home, Globe, Info, Heart, Upload, FolderOpen, Play, Settings } from 'lucide-react';
+import { Home, Globe, Info, Heart, Upload, FolderOpen, Play, Settings, Tv, FolderHeart, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 const navItems = [
   { icon: Home, label: 'Home', href: '/' },

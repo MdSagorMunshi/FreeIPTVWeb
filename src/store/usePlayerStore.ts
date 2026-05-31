@@ -8,6 +8,7 @@ export interface AppSettings {
   autoPlay: boolean;
   volume: number;
   isMuted: boolean;
+  language: 'en' | 'bn' | 'es' | 'ru' | 'ar' | 'hi' | 'ja' | 'zh';
 }
 
 export interface UploadedPlaylistMeta {
@@ -102,6 +103,7 @@ export const usePlayerStore = create<PlayerState>()(
     autoPlay: true,
     volume: 1,
     isMuted: false,
+    language: 'en',
   },
   
   updateSettings: (newSettings) => set((state) => ({

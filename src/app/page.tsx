@@ -6,6 +6,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Heart, Search } from "lucide-react";
 import { Player } from "@/components/Player";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(60);
+  const { t } = useTranslation();
   const observer = useRef<IntersectionObserver | null>(null);
   const fetchingRef = useRef(false);
 
@@ -96,25 +98,24 @@ export default function Home() {
       {/* Header Area */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-2 md:mb-4">
-            Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Live TV</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-2 sm:mb-4 tracking-tight">
+            {t('home.discover')} <br className="hidden sm:block" /> 
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">{t('home.liveTv')}</span>
           </h1>
-          <p className="text-zinc-400 text-base md:text-lg lg:text-xl max-w-2xl">
-            Stream your favorite channels with unparalleled speed and a stunning, distraction-free interface.
+          <p className="text-zinc-400 text-sm sm:text-base max-w-xl leading-relaxed">
+            {t('home.subtitle')}
             <span className="block mt-2 font-semibold text-purple-400">
-              Showing {filteredChannels.length} {filteredChannels.length === 1 ? 'channel' : 'channels'}
+              {t('home.showingChannels', filteredChannels.length)}
             </span>
           </p>
         </div>
 
         <div className="relative group w-full lg:w-[400px] xl:w-[500px]">
-          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 md:h-6 md:w-6 text-zinc-500 group-focus-within:text-purple-400 transition-colors" />
-          </div>
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 md:h-6 md:w-6 text-zinc-500 group-focus-within:text-purple-400 transition-colors" />
           <input
             type="text"
             className="w-full pl-14 pr-6 py-4 md:py-5 text-base md:text-lg bg-zinc-900/50 border border-zinc-800 rounded-3xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all glass placeholder-zinc-500 text-white shadow-xl shadow-black/20"
-            placeholder="Search channels, movies, sports..."
+            placeholder={t('home.search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -125,19 +126,19 @@ export default function Home() {
       <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 pt-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
           onClick={() => setSelectedGroup('All')}
-          className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm flex items-center gap-2 ${
+          className={`px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all shadow-lg text-xs md:text-sm flex items-center gap-2 ${
             selectedGroup === 'All' 
-              ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-900/40 scale-105' 
-              : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white glass'
+              ? 'bg-white text-black scale-105' 
+              : 'bg-white/5 text-zinc-400 hover:bg-white/10'
           }`}
         >
-          All Channels <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs ${selectedGroup === 'All' ? 'bg-white/20 text-white' : 'bg-black/30 text-zinc-500'}`}>{groupCounts['All'] || 0}</span>
+          {t('home.allChannels')} <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs ${selectedGroup === 'All' ? 'bg-black/20' : 'bg-black/30 text-zinc-500'}`}>{groupCounts['All'] || 0}</span>
         </button>
         {playlist?.groups.map(group => (
           <button
             key={group}
             onClick={() => setSelectedGroup(group)}
-            className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all shadow-lg text-xs md:text-sm flex items-center gap-2 ${
               selectedGroup === group 
                 ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-900/40 scale-105' 
                 : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white glass'
@@ -220,10 +221,12 @@ export default function Home() {
       )}
 
       {filteredChannels.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-32 text-zinc-500">
-          <Search size={64} className="mb-6 opacity-30" />
-          <p className="text-2xl md:text-3xl font-black text-white">No channels found</p>
-          <p className="text-base md:text-lg mt-3 text-zinc-400">Try adjusting your search or category filter.</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6">
+            <Search className="text-zinc-500" size={40} />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('home.noChannels')}</h2>
+          <p className="text-zinc-400">{t('home.tryAdjusting')}</p>
         </div>
       )}
 

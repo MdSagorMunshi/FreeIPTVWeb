@@ -6,6 +6,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 // Third-party Players
 import ReactPlayer from "react-player";
@@ -39,6 +40,7 @@ function ControlsOverlay({
   const [showControls, setShowControls] = useState(true);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const hideControlsTimeout = useRef<NodeJS.Timeout>(null);
+  const { t } = useTranslation();
 
   const handleMouseMove = () => {
     setShowControls(true);
@@ -77,9 +79,9 @@ function ControlsOverlay({
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-4 sm:p-6">
             <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 sm:p-6 w-full max-w-sm text-center shadow-2xl shadow-red-900/20">
               <ShieldAlert size={40} className="text-red-500 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-white mb-2">Stream Error</h3>
-              <p className="text-zinc-400 text-xs mb-4">This channel failed to load or is geo-blocked. Try using a free encrypted VPN to bypass ISP blocks.</p>
-              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors">Dismiss</button>
+              <h3 className="text-lg font-bold text-white mb-2">{t('player.streamError')}</h3>
+              <p className="text-zinc-400 text-xs mb-4">{t('player.streamErrorDesc')}</p>
+              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors">{t('player.dismiss')}</button>
             </div>
           </motion.div>
         )}

@@ -7,6 +7,7 @@ import { Playlist } from "@/types";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Heart, Search, ArrowLeft } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Player } from "@/components/Player";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import Link from "next/link";
@@ -16,12 +17,9 @@ export default function CustomPlaylistPage() {
   const router = useRouter();
   const playlistId = params.id as string;
   
-  const { 
-    currentChannel, setCurrentChannel, 
-    favorites, toggleFavorite,
-    uploadedPlaylists
-  } = usePlayerStore();
-
+  const { currentChannel, setCurrentChannel, toggleFavorite, favorites, settings } = usePlayerStore();
+  
+  const { t } = useTranslation();
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,10 +28,6 @@ export default function CustomPlaylistPage() {
   
   const observer = useRef<IntersectionObserver | null>(null);
   const fetchingRef = useRef(false);
-
-  const playlistMeta = useMemo(() => {
-    return uploadedPlaylists.find(p => p.id === playlistId);
-  }, [uploadedPlaylists, playlistId]);
 
   const observerTarget = useCallback((node: HTMLDivElement | null) => {
     if (observer.current) observer.current.disconnect();
@@ -59,7 +53,6 @@ export default function CustomPlaylistPage() {
         if (data) {
           setPlaylist(data);
         } else {
-          // Playlist deleted or not found in IndexedDB
           alert("Playlist not found in local storage.");
           router.push('/my-playlists');
         }
@@ -96,7 +89,6 @@ export default function CustomPlaylistPage() {
 
   const displayedChannels = filteredChannels.slice(0, visibleCount);
 
-  // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(60);
   }, [selectedGroup, searchQuery]);
@@ -114,48 +106,44 @@ export default function CustomPlaylistPage() {
 
   return (
     <div className="flex flex-col h-full space-y-6 md:space-y-10 pb-32 md:pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header Area */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <Link href="/my-playlists" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-4 text-sm font-semibold">
             <ArrowLeft size={16} /> Back to My Playlists
           </Link>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-2 md:mb-4">
-            {playlistMeta?.name || 'Custom Playlist'}
-          </h1>
-          <p className="text-zinc-400 text-base md:text-lg lg:text-xl max-w-2xl">
-            Custom offline playlist loaded securely from your browser cache.
-            <span className="block mt-2 font-semibold text-purple-400">
-              Showing {filteredChannels.length} {filteredChannels.length === 1 ? 'channel' : 'channels'}
-            </span>
-          </p>
+          <div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-2 tracking-tight line-clamp-1">
+              {playlist.name}
+            </h1>
+            <p className="text-zinc-400 text-sm sm:text-base max-w-xl flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              {t('home.showingChannels', filteredChannels.length)}
+            </p>
+          </div>
         </div>
 
-        <div className="relative group w-full lg:w-[400px] xl:w-[500px]">
-          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 md:h-6 md:w-6 text-zinc-500 group-focus-within:text-purple-400 transition-colors" />
-          </div>
-          <input
-            type="text"
+        <div className="relative group w-full lg:w-[400px]">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-400 transition-colors" size={20} />
+          <input 
+            type="text" 
+            placeholder={t('home.search')}
             className="w-full pl-14 pr-6 py-4 md:py-5 text-base md:text-lg bg-zinc-900/50 border border-zinc-800 rounded-3xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all glass placeholder-zinc-500 text-white shadow-xl shadow-black/20"
-            placeholder="Search channels inside playlist..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </header>
 
-      {/* Categories */}
       <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 pt-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-        <button
+        <button 
           onClick={() => setSelectedGroup('All')}
-          className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm flex items-center gap-2 ${
+          className={`px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all shadow-lg text-xs md:text-sm flex items-center gap-2 ${
             selectedGroup === 'All' 
-              ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-900/40 scale-105' 
-              : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white glass'
+              ? 'bg-white text-black scale-105' 
+              : 'bg-white/5 text-zinc-400 hover:bg-white/10'
           }`}
         >
-          All Channels <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs ${selectedGroup === 'All' ? 'bg-white/20 text-white' : 'bg-black/30 text-zinc-500'}`}>{groupCounts['All'] || 0}</span>
+          {t('home.allChannels')} <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs ${selectedGroup === 'All' ? 'bg-black/20' : 'bg-black/30 text-zinc-500'}`}>{groupCounts['All'] || 0}</span>
         </button>
         {playlist?.groups.map(group => (
           <button
@@ -172,7 +160,6 @@ export default function CustomPlaylistPage() {
         ))}
       </div>
 
-      {/* Grid */}
       <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 [media(min-width:2000px)]:grid-cols-8 gap-4 sm:gap-6 md:gap-8">
         <AnimatePresence>
           {displayedChannels.map((channel, idx) => {
@@ -190,7 +177,7 @@ export default function CustomPlaylistPage() {
                 className={`relative group rounded-3xl overflow-hidden glass-card cursor-pointer transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-purple-900/40 ${
                   isPlaying ? 'ring-4 ring-purple-500 shadow-2xl shadow-purple-900/50 -translate-y-2' : 'border border-white/5'
                 }`}
-                onClick={() => setCurrentChannel({ ...channel, group: `${playlistMeta?.name || 'Custom'} - ${channel.group}` })}
+                onClick={() => setCurrentChannel({ ...channel, group: `${playlist.name} - ${channel.group}` })}
               >
                 <div className="aspect-video bg-black/40 flex items-center justify-center p-3 md:p-4 relative">
                   {channel.logo ? (
@@ -204,14 +191,12 @@ export default function CustomPlaylistPage() {
                     <Play className="w-12 h-12 md:w-16 md:h-16 text-zinc-700" />
                   )}
                   
-                  {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.6)] transform scale-50 group-hover:scale-100 transition-transform duration-300 delay-75">
                       <Play fill="currentColor" className="text-white ml-1 w-6 h-6 md:w-8 md:h-8" />
                     </div>
                   </div>
                   
-                  {/* Favorite Button */}
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
@@ -244,10 +229,12 @@ export default function CustomPlaylistPage() {
       )}
 
       {filteredChannels.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-32 text-zinc-500">
-          <Search size={64} className="mb-6 opacity-30" />
-          <p className="text-2xl md:text-3xl font-black text-white">No channels found</p>
-          <p className="text-base md:text-lg mt-3 text-zinc-400">Try adjusting your search or category filter.</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6">
+            <Search className="text-zinc-500" size={40} />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('home.noChannels')}</h2>
+          <p className="text-zinc-400">{t('home.tryAdjusting')}</p>
         </div>
       )}
 

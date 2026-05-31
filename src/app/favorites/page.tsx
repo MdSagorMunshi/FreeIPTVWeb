@@ -2,14 +2,16 @@
 
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Heart, Search } from "lucide-react";
+import { Play, Heart, Search, HeartCrack } from "lucide-react";
 import { Player } from "@/components/Player";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { useState } from "react";
 
 export default function Favorites() {
   const { 
     favorites, currentChannel, setCurrentChannel, toggleFavorite
   } = usePlayerStore();
+  const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -20,16 +22,14 @@ export default function Favorites() {
   return (
     <div className="flex flex-col h-full space-y-6 md:space-y-10 pb-32 md:pb-12">
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-2 md:mb-4">
-            Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-400">Favorites</span>
-          </h1>
-          <p className="text-zinc-400 text-base md:text-lg lg:text-xl max-w-2xl">
-          Your personal collection of favorite channels, synced across your session.
-          <span className="block mt-2 font-semibold text-pink-400">
-            {favorites.length} {favorites.length === 1 ? 'saved channel' : 'saved channels'}
-          </span>
-        </p>
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-pink-900/50">
+            <Heart size={32} className="text-white fill-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-black text-white">{t('fav.title')}</h1>
+            <p className="text-zinc-400">{t('fav.subtitle')}</p>
+          </div>
         </div>
 
         <div className="relative group w-full lg:w-[400px] xl:w-[500px]">
@@ -39,7 +39,7 @@ export default function Favorites() {
           <input
             type="text"
             className="w-full pl-14 pr-6 py-4 md:py-5 text-base md:text-lg bg-zinc-900/50 border border-zinc-800 rounded-3xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all glass placeholder-zinc-500 text-white shadow-xl shadow-black/20"
-            placeholder="Search favorites..."
+            placeholder={t('home.search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -48,9 +48,9 @@ export default function Favorites() {
 
       {favorites.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 md:py-48 text-zinc-500">
-          <Heart size={80} className="mb-8 opacity-20 text-pink-500" />
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-3">No Favorites Yet</h2>
-          <p className="text-lg md:text-xl text-zinc-400">Click the heart icon on any channel to add it here.</p>
+          <HeartCrack size={80} className="mb-8 opacity-20 text-pink-500" />
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-3">{t('fav.noFavs')}</h2>
+          <p className="text-lg md:text-xl text-zinc-400">{t('fav.clickHeart')}</p>
         </div>
       ) : (
         <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 [media(min-width:2000px)]:grid-cols-8 gap-4 sm:gap-6 md:gap-8">
