@@ -90,7 +90,7 @@ function ControlsOverlay({
         {(showControls || !isPlaying) && !showVpnPopup && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/60 flex flex-col justify-between p-3 sm:p-4 pointer-events-none z-20">
             {/* Header */}
-            <div className="flex items-center justify-between pointer-events-auto">
+            <div className="flex items-center justify-between pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
                 {currentChannel.logo && <img src={currentChannel.logo} alt="" className="h-6 w-6 object-contain rounded-md" />}
                 <span className="text-white font-bold text-xs sm:text-sm truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[300px]">{currentChannel.name}</span>
@@ -112,7 +112,7 @@ function ControlsOverlay({
             )}
 
             {/* Bottom Controls */}
-            <div className="flex items-center justify-between mt-auto pointer-events-auto">
+            <div className="flex items-center justify-between mt-auto pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center gap-2">
                 <button onClick={togglePlay} className="p-2 sm:p-2.5 bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50" disabled={isBuffering}>
                   {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
