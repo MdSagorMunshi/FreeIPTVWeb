@@ -198,10 +198,13 @@ export function Player() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: 100 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        drag={!isFullscreen}
+        dragMomentum={false}
+        whileDrag={{ scale: 1.02, cursor: "grabbing", boxShadow: "0 0 40px rgba(168,85,247,0.6)" }}
         className={`fixed z-[100] bg-black overflow-hidden shadow-2xl shadow-purple-900/40 border border-white/10 group ${
           isFullscreen 
             ? "inset-0 rounded-none border-none" 
-            : "bottom-24 md:bottom-8 right-4 md:right-8 w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] lg:w-[500px] 2xl:w-[600px] aspect-video rounded-2xl"
+            : "bottom-24 md:bottom-8 right-4 md:right-8 w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] lg:w-[500px] 2xl:w-[600px] aspect-video rounded-2xl cursor-grab"
         }`}
         ref={containerRef}
         onMouseMove={handleMouseMove}
