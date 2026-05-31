@@ -17,16 +17,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-[#09090b] text-[#fafafa] antialiased overflow-hidden`}>
+      <body className={`${inter.className} bg-[#09090b] text-[#fafafa] antialiased overflow-hidden selection:bg-purple-500/30`}>
         <div className="flex h-screen w-full relative">
           <Sidebar />
           
-          <main className="flex-1 ml-[80px] h-full overflow-y-auto overflow-x-hidden relative">
+          <main className="flex-1 md:ml-[88px] h-full overflow-y-auto overflow-x-hidden relative pb-20 md:pb-0 scroll-smooth">
             {/* Background decorative elements */}
-            <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
-            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-600/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed top-[-15%] left-[-10%] w-[50%] h-[50%] bg-purple-600/15 rounded-full blur-[150px] pointer-events-none transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/10 rounded-full blur-[150px] pointer-events-none transform translate-x-1/4 translate-y-1/4" />
+            <div className="fixed top-[40%] right-[20%] w-[30%] h-[30%] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
             
-            <div className="relative z-10 p-6 md:p-8 lg:p-12 w-full min-h-full">
+            <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16 2xl:p-24 w-full min-h-full max-w-[2400px] mx-auto">
               {children}
             </div>
           </main>
