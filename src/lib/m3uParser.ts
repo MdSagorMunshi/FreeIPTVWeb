@@ -19,6 +19,11 @@ export const parseM3U = (content: string): Playlist => {
       currentChannel.name = nameMatch ? nameMatch[1].trim() : 'Unknown Channel';
       currentChannel.logo = logoMatch ? logoMatch[1] : '';
       let rawGroup = groupMatch ? groupMatch[1].trim() : 'Uncategorized';
+      
+      // Extract primary category if there are multiple tags separated by semicolons or commas
+      rawGroup = rawGroup.split(/[;,]/)[0].trim();
+
+      // Normalize to Title Case
       rawGroup = rawGroup
         .toLowerCase()
         .split(' ')

@@ -4,8 +4,9 @@ import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { parseM3U } from "@/lib/m3uParser";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Heart, Search, Loader2 } from "lucide-react";
+import { Play, Heart, Search } from "lucide-react";
 import { Player } from "@/components/Player";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function Home() {
   const { 
@@ -65,6 +66,15 @@ export default function Home() {
     });
   }, [playlist, selectedGroup, searchQuery]);
 
+  const groupCounts = useMemo(() => {
+    if (!playlist) return { 'All': 0 };
+    return playlist.channels.reduce((acc, channel) => {
+      acc[channel.group] = (acc[channel.group] || 0) + 1;
+      acc['All'] = (acc['All'] || 0) + 1;
+      return acc;
+    }, { 'All': 0 } as Record<string, number>);
+  }, [playlist]);
+
   const displayedChannels = filteredChannels.slice(0, visibleCount);
 
   // Reset visible count when filters change
@@ -75,12 +85,8 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="flex-1 h-full flex flex-col items-center justify-center min-h-[50vh]">
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 md:w-20 md:h-20 border-4 border-purple-500 border-t-transparent rounded-full shadow-[0_0_30px_rgba(168,85,247,0.4)]"
-        />
-        <p className="mt-6 text-zinc-400 font-bold tracking-[0.2em] uppercase text-sm md:text-base">Initializing Core...</p>
+        <LoadingIndicator theme="purple" />
+        <p className="mt-8 text-zinc-400 font-bold tracking-[0.2em] uppercase text-sm md:text-base">Initializing Core...</p>
       </div>
     );
   }
@@ -95,6 +101,9 @@ export default function Home() {
           </h1>
           <p className="text-zinc-400 text-base md:text-lg lg:text-xl max-w-2xl">
             Stream your favorite channels with unparalleled speed and a stunning, distraction-free interface.
+            <span className="block mt-2 font-semibold text-purple-400">
+              Showing {filteredChannels.length} {filteredChannels.length === 1 ? 'channel' : 'channels'}
+            </span>
           </p>
         </div>
 
@@ -116,25 +125,25 @@ export default function Home() {
       <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 pt-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
           onClick={() => setSelectedGroup('All')}
-          className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm ${
+          className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm flex items-center gap-2 ${
             selectedGroup === 'All' 
               ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-900/40 scale-105' 
               : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white glass'
           }`}
         >
-          All Channels
+          All Channels <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs ${selectedGroup === 'All' ? 'bg-white/20 text-white' : 'bg-black/30 text-zinc-500'}`}>{groupCounts['All'] || 0}</span>
         </button>
         {playlist?.groups.map(group => (
           <button
             key={group}
             onClick={() => setSelectedGroup(group)}
-            className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm ${
+            className={`px-4 py-2 md:px-5 md:py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-300 text-xs md:text-sm flex items-center gap-2 ${
               selectedGroup === group 
                 ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-900/40 scale-105' 
                 : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white glass'
             }`}
           >
-            {group}
+            {group} <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs ${selectedGroup === group ? 'bg-white/20 text-white' : 'bg-black/30 text-zinc-500'}`}>{groupCounts[group] || 0}</span>
           </button>
         ))}
       </div>
@@ -206,7 +215,7 @@ export default function Home() {
 
       {filteredChannels.length > visibleCount && (
         <div ref={observerTarget} className="flex justify-center pt-12 pb-8">
-          <Loader2 className="animate-spin text-purple-500/50" size={40} />
+          <LoadingIndicator theme="purple" />
         </div>
       )}
 

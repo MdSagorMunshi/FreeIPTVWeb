@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Loader2 } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export function Player() {
   const { currentChannel, setCurrentChannel } = usePlayerStore();
@@ -185,7 +186,9 @@ export function Player() {
         {/* Buffering Indicator */}
         {isBuffering && !showVpnPopup && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/40 backdrop-blur-sm z-10">
-            <Loader2 size={48} className="text-purple-500 animate-spin drop-shadow-[0_0_20px_rgba(168,85,247,0.8)]" />
+            <div className="scale-75 md:scale-100">
+              <LoadingIndicator theme="purple" />
+            </div>
           </div>
         )}
 

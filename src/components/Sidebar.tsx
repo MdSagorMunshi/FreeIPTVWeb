@@ -31,8 +31,8 @@ export function Sidebar() {
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="flex items-center justify-center w-full mb-12 overflow-hidden px-4">
-          <div className="min-w-[48px] h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shrink-0 shadow-lg shadow-purple-900/50">
-            <Play fill="white" size={24} className="ml-1" />
+          <div className="min-w-[48px] h-12 flex items-center justify-center shrink-0">
+            <img src="/logo.png" alt="FreeIPTV" className="w-full h-full object-contain drop-shadow-xl" />
           </div>
           {isHovered && (
             <motion.span 

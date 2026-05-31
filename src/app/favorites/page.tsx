@@ -25,8 +25,11 @@ export default function Favorites() {
             Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-400">Favorites</span>
           </h1>
           <p className="text-zinc-400 text-base md:text-lg lg:text-xl max-w-2xl">
-            Your curated collection of top channels.
-          </p>
+          Your personal collection of favorite channels, synced across your session.
+          <span className="block mt-2 font-semibold text-pink-400">
+            {favorites.length} {favorites.length === 1 ? 'saved channel' : 'saved channels'}
+          </span>
+        </p>
         </div>
 
         <div className="relative group w-full lg:w-[400px] xl:w-[500px]">
