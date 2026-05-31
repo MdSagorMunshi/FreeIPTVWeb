@@ -290,7 +290,7 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
 /* -------------------------------------------------------------------------- */
 function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
   const { settings } = usePlayerStore();
-  const playerRef = useRef<ReactPlayer>(null);
+  const playerRef = useRef<any>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -330,9 +330,11 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
     if (val === 0) setIsMuted(true);
   };
 
+  const PlayerComponent = ReactPlayer as any;
+
   return (
     <div className="absolute inset-0 bg-black">
-      <ReactPlayer 
+      <PlayerComponent 
         ref={playerRef}
         url={currentChannel.url} 
         playing={isPlaying}
@@ -346,7 +348,7 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
         onStart={() => { setIsBuffering(false); setIsPlaying(true); }}
         onPlay={() => { setIsPlaying(true); setIsBuffering(false); }}
         onPause={() => setIsPlaying(false)}
-        onError={(e) => {
+        onError={(e: any) => {
           console.error("ReactPlayer Error:", e);
           setIsBuffering(false);
           setShowVpnPopup(true);
@@ -356,7 +358,7 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
             forceHLS: true,
             attributes: { style: { width: '100%', height: '100%', objectFit: 'contain' } }
           }
-        }}
+        } as any}
       />
       <ControlsOverlay
         currentChannel={currentChannel} closePlayer={closePlayer}
