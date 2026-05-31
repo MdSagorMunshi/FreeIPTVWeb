@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Info, FileText, X } from "lucide-react";
+import { Mail, Info, FileText, X, Smartphone, ShieldAlert, Download } from "lucide-react";
 
 export default function About() {
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
@@ -101,6 +101,60 @@ export default function About() {
             <a href="mailto:ryn@disr.it" className="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors" title="Email Support">
               <Mail size={24} className="text-white" />
             </a>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Mobile App Advertisement Box */}
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="max-w-2xl w-full mt-6 bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 backdrop-blur-xl rounded-3xl p-6 relative overflow-hidden shadow-2xl shadow-blue-900/20"
+      >
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
+          <div className="w-16 h-16 shrink-0 bg-blue-500/20 rounded-2xl flex items-center justify-center border border-blue-500/30">
+            <Smartphone size={32} className="text-blue-400" />
+          </div>
+          
+          <div className="flex-1 text-center sm:text-left">
+            <h2 className="text-2xl font-black text-white mb-2">Try Our Mobile App!</h2>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
+              <span className="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-bold rounded-lg border border-green-500/20">Free Forever</span>
+              <span className="px-2.5 py-1 bg-pink-500/20 text-pink-400 text-xs font-bold rounded-lg border border-pink-500/20">No Ads</span>
+              <span className="px-2.5 py-1 bg-purple-500/20 text-purple-400 text-xs font-bold rounded-lg border border-purple-500/20">Open Source</span>
+            </div>
+            
+            <p className="text-zinc-400 text-sm mb-4">
+              Take your live TV anywhere with the official FreeIPTV Android App.
+            </p>
+
+            <div className="flex items-start gap-2 mb-5 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+              <ShieldAlert size={16} className="text-red-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-zinc-300 text-left">
+                <strong className="text-red-400">Security Notice:</strong> Please only download the app from our official GitHub Releases to avoid malicious or unofficial APKs.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a 
+                href="https://github.com/MdSagorMunshi/FreeIPTV/releases" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-colors border border-white/10"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                GitHub Releases
+              </a>
+              <a 
+                href="https://freeiptvapp.pages.dev/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-600/30"
+              >
+                <Download size={18} /> Official Website
+              </a>
+            </div>
           </div>
         </div>
       </motion.div>
