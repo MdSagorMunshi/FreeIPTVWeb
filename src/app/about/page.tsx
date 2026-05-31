@@ -9,6 +9,17 @@ export default function About() {
 
   const changelogs = [
     {
+      version: "v1.3.0",
+      date: "May 2026",
+      changes: [
+        "Major Feature: Upload custom .m3u playlists with local IndexedDB offline caching",
+        "Added Settings Dashboard for advanced application control",
+        "Multi-Engine Video Support: switch between HLS.js, Video.js, and ReactPlayer",
+        "Redesigned the application background with an aesthetic live dot-matrix grid",
+        "Added Pure OLED theme support for true-black infinite contrast"
+      ]
+    },
+    {
       version: "v1.2.0",
       date: "May 2026",
       changes: [
@@ -68,7 +79,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-8">
             <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-4 flex flex-col items-center">
               <h3 className="font-bold text-white mb-1">Version</h3>
-              <p className="text-purple-400 font-mono">1.2.0-web</p>
+              <p className="text-purple-400 font-mono">1.3.0-web</p>
             </div>
             <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-4 flex flex-col items-center">
               <h3 className="font-bold text-white mb-1">Engine</h3>
