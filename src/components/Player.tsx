@@ -298,6 +298,13 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
 
+  // Expose bundled Hls.js globally so ReactPlayer doesn't try to fetch it from a CDN
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !(window as any).Hls) {
+      (window as any).Hls = Hls;
+    }
+  }, []);
+
   useEffect(() => {
     setIsBuffering(true);
     setIsPlaying(false);
