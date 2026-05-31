@@ -69,7 +69,7 @@ function ControlsOverlay({
       {/* Buffering Indicator */}
       {isBuffering && !showVpnPopup && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/40 backdrop-blur-sm z-10">
-          <div className="scale-75 md:scale-100"><LoadingIndicator theme="purple" /></div>
+          <div className="scale-75 md:scale-100"><LoadingIndicator theme="primary" /></div>
         </div>
       )}
 
@@ -77,11 +77,11 @@ function ControlsOverlay({
       <AnimatePresence>
         {showVpnPopup && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-4 sm:p-6">
-            <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 sm:p-6 w-full max-w-sm text-center shadow-2xl shadow-red-900/20">
+            <div className="bg-surface border border-border-light rounded-[12px] p-5 sm:p-6 w-full max-w-sm text-center shadow-lg">
               <ShieldAlert size={40} className="text-red-500 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-white mb-2">{t('player.streamError')}</h3>
-              <p className="text-zinc-400 text-xs mb-4">{t('player.streamErrorDesc')}</p>
-              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors">{t('player.dismiss')}</button>
+              <h3 className="text-lg font-bold text-primary-text mb-2">{t('player.streamError')}</h3>
+              <p className="text-secondary-text text-xs mb-4">{t('player.streamErrorDesc')}</p>
+              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-primary text-white font-bold rounded-[8px] hover:bg-primary-hover transition-colors">{t('player.dismiss')}</button>
             </div>
           </motion.div>
         )}
@@ -107,7 +107,7 @@ function ControlsOverlay({
             {/* Play Button Overlay */}
             {!isPlaying && !isBuffering && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-16 h-16 bg-purple-600/80 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_0_40px_rgba(147,51,234,0.5)]">
+                <div className="w-16 h-16 bg-primary/80 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-lg">
                   <Play size={24} fill="currentColor" className="ml-1" />
                 </div>
               </div>
@@ -116,7 +116,7 @@ function ControlsOverlay({
             {/* Bottom Controls */}
             <div className="flex items-center justify-between mt-auto pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center gap-2">
-                <button onClick={togglePlay} className="p-2 sm:p-2.5 bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50" disabled={isBuffering}>
+                <button onClick={togglePlay} className="p-2 sm:p-2.5 bg-primary text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-md disabled:opacity-50" disabled={isBuffering}>
                   {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
                 </button>
                 
@@ -144,9 +144,9 @@ function ControlsOverlay({
                       {showSettings && (
                         <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full right-0 mb-3 w-40 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden">
                           <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2">Quality</div>
-                          <button onClick={() => setCurrentQuality(-1)} className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>Auto</span>{currentQuality === -1 && <Check size={14} className="text-purple-400" />}</button>
+                          <button onClick={() => setCurrentQuality(-1)} className="w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>Auto</span>{currentQuality === -1 && <Check size={14} className="text-primary" />}</button>
                           {qualities.map((level: any, i: number) => (
-                            <button key={i} onClick={() => setCurrentQuality(i)} className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>{level.height}p</span>{currentQuality === i && <Check size={14} className="text-purple-400" />}</button>
+                            <button key={i} onClick={() => setCurrentQuality(i)} className="w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>{level.height}p</span>{currentQuality === i && <Check size={14} className="text-primary" />}</button>
                           ))}
                         </motion.div>
                       )}
@@ -522,8 +522,8 @@ export function Player() {
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         drag={!isFullscreen}
         dragMomentum={false}
-        whileDrag={{ scale: 1.02, cursor: "grabbing", boxShadow: "0 0 40px rgba(168,85,247,0.6)" }}
-        className={`fixed z-[100] bg-black overflow-hidden shadow-2xl shadow-purple-900/40 border border-border group ${
+        whileDrag={{ scale: 1.02, cursor: "grabbing", boxShadow: "0 0 40px rgba(0,0,0,0.1)" }}
+        className={`fixed z-[100] bg-black overflow-hidden shadow-lg border border-border group ${
           isFullscreen 
             ? "inset-0 rounded-none border-none" 
             : "bottom-24 md:bottom-8 right-4 md:right-8 w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] lg:w-[500px] 2xl:w-[600px] aspect-video rounded-2xl cursor-grab"

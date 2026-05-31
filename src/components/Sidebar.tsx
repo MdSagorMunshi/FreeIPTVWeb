@@ -28,7 +28,7 @@ export function Sidebar() {
     <>
       {/* Desktop/TV Sidebar */}
       <motion.aside
-        className="hidden md:flex fixed left-0 top-0 h-screen z-50 glass border-r border-[rgba(255,255,255,0.1)] flex-col items-center py-8 transition-all duration-300 ease-in-out"
+        className="hidden md:flex fixed left-0 top-0 h-screen z-50 bg-surface border-r border-border-light flex-col items-center py-8 transition-all duration-300 ease-in-out shadow-sm"
         animate={{ width: isHovered ? 260 : 88 }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -41,9 +41,9 @@ export function Sidebar() {
             <motion.span 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="ml-4 font-black text-2xl text-white whitespace-nowrap tracking-wide"
+              className="ml-4 font-black text-2xl text-primary-text whitespace-nowrap tracking-wide"
             >
-              Free<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">IPTV</span>
+              Free<span className="text-primary">IPTV</span>
             </motion.span>
           )}
         </div>
@@ -56,8 +56,8 @@ export function Sidebar() {
                 <div
                   className={`flex items-center px-4 py-4 rounded-2xl cursor-pointer transition-all duration-300 group relative overflow-hidden ${
                     isActive 
-                      ? 'bg-purple-600/20 text-purple-400 border border-purple-500/20 shadow-[inset_0_0_20px_rgba(139,92,246,0.1)]' 
-                      : 'text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent'
+                      ? 'bg-primary/10 text-primary border border-primary/20' 
+                      : 'text-secondary-text hover:bg-border-light hover:text-primary-text border border-transparent'
                   }`}
                 >
                   <item.icon size={26} className={`shrink-0 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
@@ -73,7 +73,7 @@ export function Sidebar() {
                   {isActive && (
                     <motion.div
                       layoutId="activeIndicator"
-                      className="absolute left-0 w-1.5 h-10 bg-gradient-to-b from-purple-400 to-pink-500 rounded-r-full"
+                      className="absolute left-0 w-1.5 h-10 bg-primary rounded-r-[999px]"
                     />
                   )}
                 </div>
@@ -85,15 +85,15 @@ export function Sidebar() {
       </motion.aside>
 
       {/* Mobile/Tablet Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-[rgba(255,255,255,0.1)] pb-safe pt-2 px-4 flex justify-around items-center h-20">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border-light pb-safe pt-2 px-4 flex justify-around items-center h-20 shadow-lg">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link key={item.label} href={item.href} className="flex-1 flex flex-col items-center justify-center gap-1">
-              <div className={`p-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-purple-600/20 text-purple-400' : 'text-zinc-400'}`}>
+              <div className={`p-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-primary/10 text-primary' : 'text-secondary-text'}`}>
                 <item.icon size={24} className={isActive ? 'scale-110' : ''} />
               </div>
-              <span className={`text-[10px] font-medium ${isActive ? 'text-purple-400' : 'text-zinc-500'}`}>
+              <span className={`text-[10px] font-medium ${isActive ? 'text-primary' : 'text-muted-text'}`}>
                 {item.label}
               </span>
             </Link>

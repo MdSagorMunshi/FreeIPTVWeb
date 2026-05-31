@@ -18,8 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-foreground antialiased overflow-hidden selection:bg-purple-500/30 transition-colors duration-300`}>
-        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem disableTransitionOnChange>
+      <body className={`${inter.className} bg-background text-foreground antialiased overflow-hidden selection:bg-primary/30 transition-colors duration-300`}>
+        <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AppGate>
             {children}
           </AppGate>
