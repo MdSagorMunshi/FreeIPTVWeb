@@ -8,6 +8,13 @@ export interface AppSettings {
   autoPlay: boolean;
 }
 
+export interface UploadedPlaylistMeta {
+  id: string;
+  name: string;
+  channelCount: number;
+  addedAt: number;
+}
+
 interface PlayerState {
   playlist: Playlist | null;
   worldPlaylist: Playlist | null;
@@ -31,6 +38,11 @@ interface PlayerState {
   // Settings
   settings: AppSettings;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
+
+  // Custom Playlists
+  uploadedPlaylists: UploadedPlaylistMeta[];
+  addUploadedPlaylist: (meta: UploadedPlaylistMeta) => void;
+  removeUploadedPlaylist: (id: string) => void;
 }
 
 export const usePlayerStore = create<PlayerState>()(
@@ -45,6 +57,10 @@ export const usePlayerStore = create<PlayerState>()(
   selectedGroup: 'All',
   worldSearchQuery: '',
   worldSelectedGroup: 'All',
+  uploadedPlaylists: [],
+  
+  addUploadedPlaylist: (meta) => set((state) => ({ uploadedPlaylists: [...state.uploadedPlaylists, meta] })),
+  removeUploadedPlaylist: (id) => set((state) => ({ uploadedPlaylists: state.uploadedPlaylists.filter(p => p.id !== id) })),
   
   setPlaylist: (playlist) => set({ playlist }),
   
@@ -83,7 +99,7 @@ export const usePlayerStore = create<PlayerState>()(
 }),
 {
   name: 'free-iptv-storage',
-  partialize: (state) => ({ favorites: state.favorites, settings: state.settings }),
+  partialize: (state) => ({ favorites: state.favorites, settings: state.settings, uploadedPlaylists: state.uploadedPlaylists }),
 }
   )
 );

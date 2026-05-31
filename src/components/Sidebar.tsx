@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Home, Globe, Info, Heart, Upload, Play, Settings } from 'lucide-react';
+import { Home, Globe, Info, Heart, Upload, FolderOpen, Play, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ const navItems = [
   { icon: Home, label: 'Home', href: '/' },
   { icon: Globe, label: 'World', href: '/world' },
   { icon: Heart, label: 'Favorites', href: '/favorites' },
+  { icon: FolderOpen, label: 'My Playlists', href: '/my-playlists' },
   { icon: Settings, label: 'Settings', href: '/settings' },
   { icon: Info, label: 'About', href: '/about' },
 ];
@@ -80,23 +81,6 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="w-full px-4 pb-4">
-          <div
-            onClick={handleUpload}
-            className="flex items-center px-4 py-4 rounded-2xl cursor-pointer text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent transition-all group"
-          >
-            <Upload size={26} className="shrink-0 group-hover:text-pink-400 transition-colors" />
-            {isHovered && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="ml-5 font-semibold text-lg whitespace-nowrap group-hover:text-pink-400 transition-colors"
-              >
-                Upload Playlist
-              </motion.span>
-            )}
-          </div>
-        </div>
       </motion.aside>
 
       {/* Mobile/Tablet Bottom Nav */}
@@ -114,12 +98,6 @@ export function Sidebar() {
             </Link>
           );
         })}
-        <button onClick={handleUpload} className="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-400">
-          <div className="p-2 rounded-xl transition-all duration-300">
-            <Upload size={24} />
-          </div>
-          <span className="text-[10px] font-medium text-zinc-500">Upload</span>
-        </button>
       </nav>
     </>
   );
