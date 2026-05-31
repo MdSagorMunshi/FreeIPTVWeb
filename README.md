@@ -1,7 +1,17 @@
 <div align="center">
-  <img src="public/favicon.png" alt="FreeIPTV Web Logo" width="120" />
+  <img src="public/icon.png" alt="FreeIPTV Web Logo" width="120" />
   <h1>FreeIPTV Web</h1>
   <p><strong>A modern, lightning-fast, ad-free Live TV streaming application for the web.</strong></p>
+
+  <p align="center">
+    <a href="https://github.com/MdSagorMunshi/FreeIPTVWeb/blob/master/LICENSE">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" />
+    </a>
+    <img src="https://img.shields.io/badge/Next.js-16.2.6-black?logo=next.js" alt="Next.js Version" />
+    <img src="https://img.shields.io/badge/React-19.2.4-blue?logo=react" alt="React Version" />
+    <img src="https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css" alt="Tailwind Version" />
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
+  </p>
 </div>
 
 <br />
@@ -21,31 +31,58 @@
 
 ## 🚀 Getting Started
 
-First, install the dependencies:
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+
+### Installation
+
+First, clone the repository and install the dependencies:
 
 ```bash
+git clone https://github.com/MdSagorMunshi/FreeIPTVWeb.git
+cd FreeIPTVWeb
 npm install
-# or
-yarn install
-# or
-pnpm install
+# or yarn install / pnpm install
 ```
 
-Run the development server:
+### Development
+
+Run the local development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+# or yarn dev / pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
 
+## 📦 Build for Production
+
+To create an optimized production build of the application:
+
+```bash
+npm run build
+```
+
+This will compile the application into the `.next` directory. Once the build finishes, you can start the production server:
+
+```bash
+npm run start
+```
+
+## 🤝 Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
 ## 🛠️ Technology Stack
 
-- **Framework**: [Next.js 15 (React 19)](https://nextjs.org/)
+- **Framework**: [Next.js](https://nextjs.org/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **State Management**: [Zustand](https://github.com/pmndrs/zustand)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
@@ -54,8 +91,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## ⚖️ Legal Disclaimer
 
-**No Content Hosting**: FreeIPTV Web is strictly a local media player interface. We do not host, broadcast, or distribute any video streams, movies, or copyrighted content on our servers.
-**User Responsibility**: Any M3U playlists or stream links loaded into this application are the sole responsibility of the user. We are not responsible for the contents of user-uploaded playlists.
+**No Content Hosting**: FreeIPTV Web is strictly a local media player interface. We do not host, broadcast, or distribute any video streams, movies, or copyrighted content on our servers.  
+**User Responsibility**: Any M3U playlists or stream links loaded into this application are the sole responsibility of the user. We are not responsible for the contents of user-uploaded playlists.  
 **Local Data**: We do not collect or transmit your personal data or playlist contents to remote servers. All data is stored locally in your browser's offline cache.
 
 ## 📄 License
