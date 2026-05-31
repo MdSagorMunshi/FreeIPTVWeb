@@ -1,5 +1,12 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Channel, Playlist } from '@/types';
+
+export interface AppSettings {
+  engine: 'hls' | 'react-player' | 'videojs';
+  theme: 'dark' | 'light' | 'oled';
+  autoPlay: boolean;
+}
 
 interface PlayerState {
   playlist: Playlist | null;
@@ -20,9 +27,15 @@ interface PlayerState {
   setSelectedGroup: (group: string) => void;
   setWorldSearchQuery: (query: string) => void;
   setWorldSelectedGroup: (group: string) => void;
+  
+  // Settings
+  settings: AppSettings;
+  updateSettings: (newSettings: Partial<AppSettings>) => void;
 }
 
-export const usePlayerStore = create<PlayerState>((set) => ({
+export const usePlayerStore = create<PlayerState>()(
+  persist(
+    (set) => ({
   playlist: null,
   worldPlaylist: null,
   currentChannel: null,
@@ -54,7 +67,23 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   
   setSelectedGroup: (group) => set({ selectedGroup: group }),
   
-  setWorldSearchQuery: (query) => set({ worldSearchQuery: query }),
+  setWorldSearchQuery: (query: string) => set({ worldSearchQuery: query }),
   
-  setWorldSelectedGroup: (group) => set({ worldSelectedGroup: group }),
-}));
+  setWorldSelectedGroup: (group: string) => set({ worldSelectedGroup: group }),
+  
+  settings: {
+    engine: 'hls',
+    theme: 'dark',
+    autoPlay: true,
+  },
+  
+  updateSettings: (newSettings) => set((state) => ({
+    settings: { ...state.settings, ...newSettings }
+  })),
+}),
+{
+  name: 'free-iptv-storage',
+  partialize: (state) => ({ favorites: state.favorites, settings: state.settings }),
+}
+  )
+);

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Home, Globe, Info, Heart, Upload, Play } from 'lucide-react';
+import { Home, Globe, Info, Heart, Upload, Play, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ const navItems = [
   { icon: Home, label: 'Home', href: '/' },
   { icon: Globe, label: 'World', href: '/world' },
   { icon: Heart, label: 'Favorites', href: '/favorites' },
+  { icon: Settings, label: 'Settings', href: '/settings' },
   { icon: Info, label: 'About', href: '/about' },
 ];
 
