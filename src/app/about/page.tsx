@@ -11,6 +11,21 @@ export default function About() {
 
   const changelogs = [
     {
+      version: "v1.6.0",
+      date: "June 01, 2026",
+      changes: [
+        "Advanced Matte & Frosted Glassmorphism visual overhaul and structural improvements.",
+        "Introduced low-CPU moving mesh gradients with custom sand grain tactile overlay.",
+        "Implemented interactive YouTube-style sub-menus in the video player Settings panel.",
+        "Added Playback Speed Controls (0.5x - 2.0x) and Adaptive Aspect Ratio adjustments (Fit, Stretch, Zoom).",
+        "Added automatic landscape lock (auto-rotate fullscreen) for mobile/tablet screens.",
+        "Added mouse double-click and mobile double-tap gestures to quickly toggle fullscreen.",
+        "Added global keyboard 'F' / 'f' key shortcut for fullscreen toggle.",
+        "Fixed mobile volume bugs (stuck auto-hide overlay timer and touch click-propagation locks).",
+        "Added native Picture-in-Picture (PiP) support with a direct control bar toggle shortcut."
+      ]
+    },
+    {
       version: "v1.5.0",
       date: "June 01, 2026",
       changes: [
@@ -106,7 +121,7 @@ export default function About() {
                 <div>
                   <h2 className="text-2xl font-bold text-primary-text">FreeIPTV Web</h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-bold px-2 py-1 bg-surface text-primary-text border border-border-light rounded-md">{t('about.version')} 1.5.0</span>
+                    <span className="text-xs font-bold px-2 py-1 bg-surface text-primary-text border border-border-light rounded-md">{t('about.version')} 1.6.0</span>
                     <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md">{t('about.engine')} HLS Core</span>
                   </div>
                 </div>

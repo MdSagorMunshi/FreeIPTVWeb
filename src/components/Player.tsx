@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check, ChevronRight, ChevronLeft, RotateCw } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check, ChevronRight, ChevronLeft, RotateCw, PictureInPicture2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -35,6 +35,13 @@ function ControlsOverlay({
   qualities,
   currentQuality,
   setCurrentQuality,
+  containerRef,
+  playbackSpeed,
+  setPlaybackSpeed,
+  aspectRatio,
+  setAspectRatio,
+  togglePip,
+  isPip
 }: any) {
   const { settings, updateSettings } = usePlayerStore();
   const [showControls, setShowControls] = useState(true);
@@ -47,20 +54,8 @@ function ControlsOverlay({
     setShowControls(true);
     if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
     hideControlsTimeout.current = setTimeout(() => {
-      if (isPlaying && !showVpnPopup && !showSettings) {
-        setShowControls(false);
-        setShowVolumeSlider(false);
-      }
+      if (isPlaying && !showVpnPopup && !showSettings && !showVolumeSlider) setShowControls(false);
     }, 3000);
-  };
-
-  const handleVolumeButtonClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!showVolumeSlider) {
-      setShowVolumeSlider(true);
-    } else {
-      toggleMute(e);
-    }
   };
 
   useEffect(() => {
@@ -75,6 +70,15 @@ function ControlsOverlay({
     }
   }, [showSettings]);
 
+  const handleVolumeButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!showVolumeSlider) {
+      setShowVolumeSlider(true);
+    } else {
+      toggleMute(e);
+    }
+  };
+
   return (
     <div 
       className="absolute inset-0 z-10"
@@ -85,7 +89,7 @@ function ControlsOverlay({
         if (showSettings) { e.stopPropagation(); setShowSettings(false); } 
         else {
           if (e.detail === 2) {
-            toggleFullscreen(e);
+            toggleFullscreen(e, true);
           } else {
             togglePlay(e);
           }
@@ -188,6 +192,19 @@ function ControlsOverlay({
                   <RotateCw size={16} />
                 </button>
 
+                {/* Direct Picture-in-Picture Toggle */}
+                <button 
+                  onClick={togglePip} 
+                  className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 hover:scale-105 active:scale-95 ${
+                    isPip 
+                      ? 'bg-primary text-white shadow-[0_4px_12px_rgba(99,102,241,0.3)]' 
+                      : 'bg-white/5 text-white hover:bg-white/15'
+                  }`}
+                  title="Picture in Picture"
+                >
+                  <PictureInPicture2 size={16} />
+                </button>
+
                 <div className="relative">
                   <button onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }} className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 ${showSettings ? 'bg-white/20 text-white' : 'bg-white/5 text-white hover:bg-white/15'}`}>
                     <Settings size={16} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
@@ -219,16 +236,6 @@ function ControlsOverlay({
                                 </span>
                               </button>
                             )}
-
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); updateSettings({ autoRotate: !settings.autoRotate }); }} 
-                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"
-                            >
-                              <span>Auto Rotate</span>
-                              <span className="text-xs text-zinc-400 font-medium">
-                                {settings.autoRotate ? 'On' : 'Off'}
-                              </span>
-                            </button>
 
                             <button 
                               onClick={(e) => { e.stopPropagation(); setCurrentMenu('speed'); }} 
@@ -358,7 +365,9 @@ function HlsEngine({
   playbackSpeed,
   setPlaybackSpeed,
   aspectRatio,
-  setAspectRatio
+  setAspectRatio,
+  togglePip,
+  isPip
 }: any) {
   const { settings, updateSettings } = usePlayerStore();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -371,7 +380,6 @@ function HlsEngine({
 
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
-  
   const [showSettings, setShowSettings] = useState(false);
   const hlsRef = useRef<Hls | null>(null);
   const [qualities, setQualities] = useState<any[]>([]);
@@ -488,6 +496,7 @@ function HlsEngine({
         containerRef={containerRef}
         playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed}
         aspectRatio={aspectRatio} setAspectRatio={setAspectRatio}
+        togglePip={togglePip} isPip={isPip}
       />
     </div>
   );
@@ -505,7 +514,9 @@ function ReactPlayerEngine({
   playbackSpeed,
   setPlaybackSpeed,
   aspectRatio,
-  setAspectRatio
+  setAspectRatio,
+  togglePip,
+  isPip
 }: any) {
   const { settings, updateSettings } = usePlayerStore();
   const playerRef = useRef<any>(null);
@@ -595,6 +606,7 @@ function ReactPlayerEngine({
         qualities={[]} 
         playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed}
         aspectRatio={aspectRatio} setAspectRatio={setAspectRatio}
+        togglePip={togglePip} isPip={isPip}
       />
     </div>
   );
@@ -612,7 +624,9 @@ function VideoJsEngine({
   playbackSpeed,
   setPlaybackSpeed,
   aspectRatio,
-  setAspectRatio
+  setAspectRatio,
+  togglePip,
+  isPip
 }: any) {
   const { settings, updateSettings } = usePlayerStore();
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -711,6 +725,7 @@ function VideoJsEngine({
         qualities={[]}
         playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed}
         aspectRatio={aspectRatio} setAspectRatio={setAspectRatio}
+        togglePip={togglePip} isPip={isPip}
       />
     </div>
   );
@@ -725,12 +740,29 @@ export function Player() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [aspectRatio, setAspectRatio] = useState('contain');
+  const [isPip, setIsPip] = useState(false);
 
   // Reset transient settings when currentChannel changes
   useEffect(() => {
     setPlaybackSpeed(1);
     setAspectRatio('contain');
   }, [currentChannel]);
+
+  // Picture in Picture global listeners
+  useEffect(() => {
+    const handlePipChange = () => {
+      if (containerRef.current) {
+        const video = containerRef.current.querySelector('video');
+        setIsPip(document.pictureInPictureElement === video && video !== null);
+      }
+    };
+    document.addEventListener('enterpictureinpicture', handlePipChange, true);
+    document.addEventListener('leavepictureinpicture', handlePipChange, true);
+    return () => {
+      document.removeEventListener('enterpictureinpicture', handlePipChange, true);
+      document.removeEventListener('leavepictureinpicture', handlePipChange, true);
+    };
+  }, []);
 
   const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent, forceRotate?: boolean) => {
     e?.stopPropagation();
@@ -759,6 +791,27 @@ export function Player() {
           console.warn("Screen orientation unlock failed:", err);
         }
       }
+    }
+  };
+
+  const togglePip = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!containerRef.current) return;
+    const video = containerRef.current.querySelector('video');
+    if (!video) return;
+
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+      } else {
+        if (document.pictureInPictureEnabled) {
+          await video.requestPictureInPicture();
+        } else {
+          alert("Picture-in-Picture is not supported by your browser.");
+        }
+      }
+    } catch (err) {
+      console.error("Picture-in-Picture error:", err);
     }
   };
 
@@ -834,6 +887,8 @@ export function Player() {
             setPlaybackSpeed={setPlaybackSpeed}
             aspectRatio={aspectRatio}
             setAspectRatio={setAspectRatio}
+            togglePip={togglePip}
+            isPip={isPip}
           />
         )}
         
@@ -848,6 +903,8 @@ export function Player() {
             setPlaybackSpeed={setPlaybackSpeed}
             aspectRatio={aspectRatio}
             setAspectRatio={setAspectRatio}
+            togglePip={togglePip}
+            isPip={isPip}
           />
         )}
         
@@ -862,6 +919,8 @@ export function Player() {
             setPlaybackSpeed={setPlaybackSpeed}
             aspectRatio={aspectRatio}
             setAspectRatio={setAspectRatio}
+            togglePip={togglePip}
+            isPip={isPip}
           />
         )}
       </motion.div>
