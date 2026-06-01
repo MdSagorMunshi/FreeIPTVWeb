@@ -106,12 +106,40 @@ function ControlsOverlay({
       {/* VPN Popup */}
       <AnimatePresence>
         {showVpnPopup && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-lg p-4 sm:p-6">
-            <div className="bg-surface/90 dark:bg-surface/80 backdrop-blur-2xl border border-border-light rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
-              <ShieldAlert size={40} className="text-red-500 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-primary-text mb-2">{t('player.streamError')}</h3>
-              <p className="text-secondary-text text-xs mb-4 leading-relaxed">{t('player.streamErrorDesc')}</p>
-              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-md">{t('player.dismiss')}</button>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-3 sm:p-4">
+            <div className="bg-zinc-950/95 border border-white/10 rounded-2xl p-4 sm:p-5 w-[92%] max-w-md text-center shadow-2xl">
+              <ShieldAlert size={24} className="text-red-500 mx-auto mb-2 animate-pulse" />
+              <h3 className="text-sm sm:text-base font-extrabold text-white mb-1">{t('player.streamError')}</h3>
+              <p className="text-zinc-400 text-[10px] sm:text-xs mb-3 leading-normal max-w-[95%] mx-auto">
+                {t('player.streamErrorDesc')}
+              </p>
+              
+              {/* VPN recommendations grid */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {[
+                  { name: "Proton VPN", logo: "/logos/proton.png", url: "https://protonvpn.com", desc: "Unlimited Free Data" },
+                  { name: "1.1.1.1 Warp", logo: "/logos/warp.png", url: "https://1.1.1.1", desc: "Fast & Secured" },
+                  { name: "Psiphon", logo: "/logos/psiphon.png", url: "https://psiphon.ca", desc: "Bypass Censorship" },
+                  { name: "Riseup VPN", logo: "/logos/riseup.png", url: "https://riseup.net/vpn", desc: "Privacy Focused" }
+                ].map((vpn) => (
+                  <a 
+                    href={vpn.url} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    key={vpn.name}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/8 hover:border-white/20 rounded-xl hover:bg-white/10 transition-all text-left group pointer-events-auto"
+                  >
+                    <img src={vpn.logo} alt={vpn.name} className="w-6.5 h-6.5 object-contain rounded-lg bg-black/35 p-1 group-hover:scale-105 transition-transform shrink-0" />
+                    <div className="overflow-hidden">
+                      <div className="text-white font-extrabold text-[9px] sm:text-[11px] truncate">{vpn.name}</div>
+                      <div className="text-zinc-500 font-medium text-[8px] sm:text-[9px] truncate">{vpn.desc}</div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-1.5 bg-white hover:bg-zinc-200 text-black font-extrabold rounded-xl transition-colors shadow-md text-[10px] sm:text-xs pointer-events-auto">{t('player.dismiss')}</button>
             </div>
           </motion.div>
         )}

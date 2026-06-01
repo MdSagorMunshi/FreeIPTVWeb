@@ -22,7 +22,8 @@ export default function About() {
         "Added mouse double-click and mobile double-tap gestures to quickly toggle fullscreen.",
         "Added global keyboard 'F' / 'f' key shortcut for fullscreen toggle.",
         "Fixed mobile volume bugs (stuck auto-hide overlay timer and touch click-propagation locks).",
-        "Added native Picture-in-Picture (PiP) support with a direct control bar toggle shortcut."
+        "Added native Picture-in-Picture (PiP) support with a direct control bar toggle shortcut.",
+        "Redesigned the stream error popup into a dark matte console recommending secure free VPN options (Proton VPN, Warp, Psiphon, Riseup) with active links and branding logos."
       ]
     },
     {
