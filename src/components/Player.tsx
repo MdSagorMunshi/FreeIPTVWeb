@@ -68,7 +68,7 @@ function ControlsOverlay({
     >
       {/* Buffering Indicator */}
       {isBuffering && !showVpnPopup && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/40 backdrop-blur-sm z-10">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/35 backdrop-blur-md z-10">
           <div className="scale-75 md:scale-100"><LoadingIndicator theme="primary" /></div>
         </div>
       )}
@@ -76,12 +76,12 @@ function ControlsOverlay({
       {/* VPN Popup */}
       <AnimatePresence>
         {showVpnPopup && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-4 sm:p-6">
-            <div className="bg-surface border border-border-light rounded-[12px] p-5 sm:p-6 w-full max-w-sm text-center shadow-lg">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-lg p-4 sm:p-6">
+            <div className="bg-surface/90 dark:bg-surface/80 backdrop-blur-2xl border border-border-light rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
               <ShieldAlert size={40} className="text-red-500 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-primary-text mb-2">{t('player.streamError')}</h3>
-              <p className="text-secondary-text text-xs mb-4">{t('player.streamErrorDesc')}</p>
-              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-primary text-white font-bold rounded-[8px] hover:bg-primary-hover transition-colors">{t('player.dismiss')}</button>
+              <p className="text-secondary-text text-xs mb-4 leading-relaxed">{t('player.streamErrorDesc')}</p>
+              <button onClick={(e) => { e.stopPropagation(); setShowVpnPopup(false); }} className="w-full py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-md">{t('player.dismiss')}</button>
             </div>
           </motion.div>
         )}
@@ -90,15 +90,15 @@ function ControlsOverlay({
       {/* Controls */}
       <AnimatePresence>
         {(showControls || !isPlaying) && !showVpnPopup && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/60 flex flex-col justify-between p-3 sm:p-4 pointer-events-none z-20">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50 flex flex-col justify-between p-4 pointer-events-none z-20">
             {/* Header */}
             <div className="flex items-center justify-between pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                {currentChannel.logo && <img src={currentChannel.logo} alt="" className="h-6 w-6 object-contain rounded-md" />}
-                <span className="text-white font-bold text-xs sm:text-sm truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[300px]">{currentChannel.name}</span>
+              <div className="flex items-center gap-2.5 bg-black/45 backdrop-blur-2xl px-4 py-2 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
+                {currentChannel.logo && <img src={currentChannel.logo} alt="" className="h-5 w-5 object-contain rounded-md" />}
+                <span className="text-white font-extrabold text-xs sm:text-sm truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[300px]">{currentChannel.name}</span>
               </div>
               {!isFullscreen && (
-                <button onClick={closePlayer} className="p-1.5 sm:p-2 bg-black/60 backdrop-blur-xl rounded-full text-white/70 hover:text-white hover:bg-white/10 border border-white/10 transition-all shadow-lg pointer-events-auto">
+                <button onClick={closePlayer} className="p-2 bg-black/45 backdrop-blur-2xl rounded-full text-white/80 hover:text-white hover:bg-white/15 border border-white/10 hover:border-white/20 transition-all shadow-lg pointer-events-auto hover:scale-105 active:scale-95">
                   <X size={16} />
                 </button>
               )}
@@ -106,55 +106,63 @@ function ControlsOverlay({
 
             {/* Play Button Overlay */}
             {!isPlaying && !isBuffering && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-16 h-16 bg-primary/80 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-lg">
-                  <Play size={24} fill="currentColor" className="ml-1" />
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }} 
+                animate={{ scale: 1, opacity: 1 }} 
+                exit={{ scale: 0.8, opacity: 0 }} 
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              >
+                <div className="w-16 h-16 bg-primary/85 backdrop-blur-xl rounded-full flex items-center justify-center text-white shadow-[0_12px_36px_rgba(99,102,241,0.4)] border border-primary/20">
+                  <Play size={24} fill="currentColor" className="ml-1 text-white" />
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            {/* Bottom Controls */}
-            <div className="flex items-center justify-between mt-auto pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-2">
-                <button onClick={togglePlay} className="p-2 sm:p-2.5 bg-primary text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-md disabled:opacity-50" disabled={isBuffering}>
-                  {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
+            {/* Bottom Floating Console Command Deck */}
+            <div 
+              className="flex items-center justify-between mt-auto bg-black/55 backdrop-blur-2xl border border-white/10 rounded-2xl p-2.5 shadow-[0_16px_40px_rgba(0,0,0,0.5)] pointer-events-auto" 
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2.5">
+                <button onClick={togglePlay} className="p-2.5 bg-primary text-white rounded-full hover:scale-110 active:scale-90 transition-all shadow-md disabled:opacity-50" disabled={isBuffering}>
+                  {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
                 </button>
                 
                 <div className="flex items-center relative group" onMouseEnter={() => setShowVolumeSlider(true)} onMouseLeave={() => setShowVolumeSlider(false)}>
-                  <button onClick={toggleMute} className="p-2 sm:p-2.5 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5">
-                    {volume === 0 || isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                  <button onClick={toggleMute} className="p-2.5 text-white hover:bg-white/15 rounded-full transition-all backdrop-blur-xl bg-white/5 border border-white/5">
+                    {volume === 0 || isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
                   </button>
                   <AnimatePresence>
                     {showVolumeSlider && (
-                      <motion.div initial={{ width: 0, opacity: 0, marginLeft: 0 }} animate={{ width: 80, opacity: 1, marginLeft: 8 }} exit={{ width: 0, opacity: 0, marginLeft: 0 }} className="overflow-hidden flex items-center bg-black/40 backdrop-blur-md rounded-full px-2 h-9 border border-white/5">
-                        <input type="range" min="0" max="1" step="0.05" value={isMuted ? 0 : volume} onChange={(e) => { const val = parseFloat(e.target.value); setVolume(val); }} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white" />
+                      <motion.div initial={{ width: 0, opacity: 0, marginLeft: 0 }} animate={{ width: 80, opacity: 1, marginLeft: 10 }} exit={{ width: 0, opacity: 0, marginLeft: 0 }} className="overflow-hidden flex items-center bg-black/40 backdrop-blur-2xl rounded-full px-3 h-9 border border-white/10 shadow-lg">
+                        <input type="range" min="0" max="1" step="0.05" value={isMuted ? 0 : volume} onChange={(e) => { const val = parseFloat(e.target.value); setVolume(val); }} className="w-full h-1 bg-white/25 rounded-lg appearance-none cursor-pointer accent-white" />
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 relative">
+              <div className="flex items-center gap-2.5 relative">
                 {qualities && qualities.length > 0 && (
                   <div className="relative">
-                    <button onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }} className={`p-2 sm:p-2.5 rounded-full transition-colors backdrop-blur-md border border-white/5 ${showSettings ? 'bg-white/30 text-white' : 'bg-black/40 text-white hover:bg-white/20'}`}>
-                      <Settings size={18} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
+                    <button onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }} className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 ${showSettings ? 'bg-white/20 text-white' : 'bg-white/5 text-white hover:bg-white/15'}`}>
+                      <Settings size={16} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
                     </button>
                     <AnimatePresence>
                       {showSettings && (
-                        <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full right-0 mb-3 w-40 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden">
+                        <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full right-0 mb-3.5 w-44 bg-zinc-950/85 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 shadow-[0_16px_48px_rgba(0,0,0,0.8)] overflow-hidden">
                           <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2">Quality</div>
-                          <button onClick={() => setCurrentQuality(-1)} className="w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>Auto</span>{currentQuality === -1 && <Check size={14} className="text-primary" />}</button>
+                          <button onClick={() => setCurrentQuality(-1)} className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>Auto</span>{currentQuality === -1 && <Check size={14} className="text-primary" />}</button>
                           {qualities.map((level: any, i: number) => (
-                            <button key={i} onClick={() => setCurrentQuality(i)} className="w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>{level.height}p</span>{currentQuality === i && <Check size={14} className="text-primary" />}</button>
+                            <button key={i} onClick={() => setCurrentQuality(i)} className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>{level.height}p</span>{currentQuality === i && <Check size={14} className="text-primary" />}</button>
                           ))}
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
                 )}
-                <button onClick={toggleFullscreen} className="p-2 sm:p-2.5 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-md bg-black/40 border border-white/5">
-                  {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+                <button onClick={toggleFullscreen} className="p-2.5 text-white hover:bg-white/15 rounded-full transition-all backdrop-blur-xl bg-white/5 border border-white/5">
+                  {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
                 </button>
               </div>
             </div>
