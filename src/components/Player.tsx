@@ -63,6 +63,19 @@ function ControlsOverlay({
     return () => { if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current); };
   }, [isPlaying, showVpnPopup, showSettings, showVolumeSlider]);
 
+  const hideVolumeTimeout = useRef<NodeJS.Timeout>(null);
+  const resetVolumeTimeout = () => {
+    if (hideVolumeTimeout.current) clearTimeout(hideVolumeTimeout.current);
+    hideVolumeTimeout.current = setTimeout(() => {
+      setShowVolumeSlider(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    if (showVolumeSlider) resetVolumeTimeout();
+    return () => { if (hideVolumeTimeout.current) clearTimeout(hideVolumeTimeout.current); };
+  }, [showVolumeSlider, volume]);
+
   // Reset menu back to main when settings panel is hidden
   useEffect(() => {
     if (!showSettings) {
@@ -72,8 +85,14 @@ function ControlsOverlay({
 
   const handleVolumeButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!showVolumeSlider) {
-      setShowVolumeSlider(true);
+    const isTouch = typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches;
+    if (isTouch) {
+      if (!showVolumeSlider) {
+        setShowVolumeSlider(true);
+        resetVolumeTimeout();
+      } else {
+        toggleMute(e);
+      }
     } else {
       toggleMute(e);
     }
@@ -188,10 +207,10 @@ function ControlsOverlay({
                 
                 <div 
                   className="flex items-center relative group" 
-                  onMouseEnter={() => setShowVolumeSlider(true)} 
+                  onMouseEnter={() => { setShowVolumeSlider(true); resetVolumeTimeout(); }} 
                   onMouseLeave={() => setShowVolumeSlider(false)}
                   onClick={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => { e.stopPropagation(); if (!showVolumeSlider) { setShowVolumeSlider(true); resetVolumeTimeout(); } }}
                 >
                   <button onClick={handleVolumeButtonClick} className="p-2.5 text-white hover:bg-white/15 rounded-full transition-all backdrop-blur-xl bg-white/5 border border-white/5">
                     {volume === 0 || isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -800,8 +819,8 @@ export function Player() {
       setIsFullscreen(true);
       
       // Auto rotate mobile devices to landscape on fullscreen
-      if ((settings.autoRotate || forceRotate) && window.screen && window.screen.orientation && window.screen.orientation.lock) {
-        window.screen.orientation.lock("landscape").catch((err) => {
+      if ((settings.autoRotate || forceRotate) && window.screen && window.screen.orientation && (window.screen.orientation as any).lock) {
+        (window.screen.orientation as any).lock("landscape").catch((err: any) => {
           console.warn("Screen orientation lock failed:", err);
         });
       }
@@ -812,9 +831,9 @@ export function Player() {
       setIsFullscreen(false);
       
       // Unlock orientation back to default sensor mode
-      if (window.screen && window.screen.orientation && window.screen.orientation.unlock) {
+      if (window.screen && window.screen.orientation && (window.screen.orientation as any).unlock) {
         try {
-          window.screen.orientation.unlock();
+          (window.screen.orientation as any).unlock();
         } catch (err) {
           console.warn("Screen orientation unlock failed:", err);
         }
@@ -849,9 +868,9 @@ export function Player() {
       setIsFullscreen(activeFs);
       
       // Release orientation lock if exiting fullscreen through browser buttons
-      if (!activeFs && window.screen && window.screen.orientation && window.screen.orientation.unlock) {
+      if (!activeFs && window.screen && window.screen.orientation && (window.screen.orientation as any).unlock) {
         try {
-          window.screen.orientation.unlock();
+          (window.screen.orientation as any).unlock();
         } catch (err) {
           console.warn(err);
         }
