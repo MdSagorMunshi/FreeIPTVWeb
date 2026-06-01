@@ -9,6 +9,7 @@ export interface AppSettings {
   volume: number;
   isMuted: boolean;
   language: 'en' | 'bn' | 'es' | 'ru' | 'ar' | 'hi' | 'ja' | 'zh';
+  autoRotate: boolean;
 }
 
 export interface UploadedPlaylistMeta {
@@ -104,6 +105,7 @@ export const usePlayerStore = create<PlayerState>()(
     volume: 1,
     isMuted: false,
     language: 'en',
+    autoRotate: true,
   },
   
   updateSettings: (newSettings) => set((state) => ({

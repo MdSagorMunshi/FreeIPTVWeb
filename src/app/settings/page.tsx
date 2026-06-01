@@ -129,28 +129,56 @@ export default function Settings() {
               <h2 className="text-xl font-extrabold text-primary-text">Playback</h2>
             </div>
             
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-extrabold text-primary-text text-base md:text-lg">{t('settings.autoplay')}</h3>
-                <p className="text-secondary-text text-xs md:text-sm font-semibold mt-0.5">{t('settings.autoplayDesc')}</p>
+            <div className="flex flex-col gap-6">
+              {/* Autoplay */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-extrabold text-primary-text text-base md:text-lg">{t('settings.autoplay')}</h3>
+                  <p className="text-secondary-text text-xs md:text-sm font-semibold mt-0.5">{t('settings.autoplayDesc')}</p>
+                </div>
+                
+                {/* Premium Spring Switch */}
+                <button 
+                  onClick={() => updateSettings({ autoPlay: !settings.autoPlay })}
+                  className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 border border-white/5 cursor-pointer outline-none ${
+                    settings.autoPlay ? 'bg-primary shadow-[0_2px_8px_rgba(99,102,241,0.3)]' : 'bg-border-light'
+                  }`}
+                >
+                  <motion.span 
+                    layout
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="inline-block h-6 w-6 transform rounded-full bg-white shadow-md"
+                    style={{
+                      marginLeft: settings.autoPlay ? '34px' : '4px'
+                    }}
+                  />
+                </button>
               </div>
-              
-              {/* Premium Spring Switch */}
-              <button 
-                onClick={() => updateSettings({ autoPlay: !settings.autoPlay })}
-                className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 border border-white/5 cursor-pointer outline-none ${
-                  settings.autoPlay ? 'bg-primary shadow-[0_2px_8px_rgba(99,102,241,0.3)]' : 'bg-border-light'
-                }`}
-              >
-                <motion.span 
-                  layout
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className="inline-block h-6 w-6 transform rounded-full bg-white shadow-md"
-                  style={{
-                    marginLeft: settings.autoPlay ? '34px' : '4px'
-                  }}
-                />
-              </button>
+
+              {/* Auto Rotate Fullscreen */}
+              <div className="flex items-center justify-between pt-5 border-t border-border-light">
+                <div>
+                  <h3 className="font-extrabold text-primary-text text-base md:text-lg">Auto-Rotate Fullscreen</h3>
+                  <p className="text-secondary-text text-xs md:text-sm font-semibold mt-0.5">Automatically rotate mobile and tablet screens to landscape on fullscreen</p>
+                </div>
+                
+                {/* Premium Spring Switch */}
+                <button 
+                  onClick={() => updateSettings({ autoRotate: !settings.autoRotate })}
+                  className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 border border-white/5 cursor-pointer outline-none ${
+                    settings.autoRotate ? 'bg-primary shadow-[0_2px_8px_rgba(99,102,241,0.3)]' : 'bg-border-light'
+                  }`}
+                >
+                  <motion.span 
+                    layout
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="inline-block h-6 w-6 transform rounded-full bg-white shadow-md"
+                    style={{
+                      marginLeft: settings.autoRotate ? '34px' : '4px'
+                    }}
+                  />
+                </button>
+              </div>
             </div>
           </section>
 

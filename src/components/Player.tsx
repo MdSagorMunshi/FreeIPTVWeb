@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check, ChevronRight, ChevronLeft } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check, ChevronRight, ChevronLeft, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -35,12 +35,8 @@ function ControlsOverlay({
   qualities,
   currentQuality,
   setCurrentQuality,
-  containerRef,
-  playbackSpeed,
-  setPlaybackSpeed,
-  aspectRatio,
-  setAspectRatio
 }: any) {
+  const { settings, updateSettings } = usePlayerStore();
   const [showControls, setShowControls] = useState(true);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [currentMenu, setCurrentMenu] = useState<'main' | 'quality' | 'speed' | 'aspect'>('main');
@@ -51,8 +47,20 @@ function ControlsOverlay({
     setShowControls(true);
     if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
     hideControlsTimeout.current = setTimeout(() => {
-      if (isPlaying && !showVpnPopup && !showSettings && !showVolumeSlider) setShowControls(false);
+      if (isPlaying && !showVpnPopup && !showSettings) {
+        setShowControls(false);
+        setShowVolumeSlider(false);
+      }
     }, 3000);
+  };
+
+  const handleVolumeButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!showVolumeSlider) {
+      setShowVolumeSlider(true);
+    } else {
+      toggleMute(e);
+    }
   };
 
   useEffect(() => {
@@ -146,8 +154,14 @@ function ControlsOverlay({
                   {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
                 </button>
                 
-                <div className="flex items-center relative group" onMouseEnter={() => setShowVolumeSlider(true)} onMouseLeave={() => setShowVolumeSlider(false)}>
-                  <button onClick={toggleMute} className="p-2.5 text-white hover:bg-white/15 rounded-full transition-all backdrop-blur-xl bg-white/5 border border-white/5">
+                <div 
+                  className="flex items-center relative group" 
+                  onMouseEnter={() => setShowVolumeSlider(true)} 
+                  onMouseLeave={() => setShowVolumeSlider(false)}
+                  onClick={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
+                  <button onClick={handleVolumeButtonClick} className="p-2.5 text-white hover:bg-white/15 rounded-full transition-all backdrop-blur-xl bg-white/5 border border-white/5">
                     {volume === 0 || isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
                   </button>
                   <AnimatePresence>
@@ -161,6 +175,19 @@ function ControlsOverlay({
               </div>
               
               <div className="flex items-center gap-2.5 relative">
+                {/* Direct Auto-Rotate Fullscreen Toggle */}
+                <button 
+                  onClick={(e) => { e.stopPropagation(); toggleFullscreen(e, true); }} 
+                  className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 hover:scale-105 active:scale-95 ${
+                    isFullscreen 
+                      ? 'bg-primary text-white shadow-[0_4px_12px_rgba(99,102,241,0.3)]' 
+                      : 'bg-white/5 text-white hover:bg-white/15'
+                  }`}
+                  title={isFullscreen ? "Exit Fullscreen" : "Rotate Landscape Fullscreen"}
+                >
+                  <RotateCw size={16} />
+                </button>
+
                 <div className="relative">
                   <button onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }} className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 ${showSettings ? 'bg-white/20 text-white' : 'bg-white/5 text-white hover:bg-white/15'}`}>
                     <Settings size={16} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
@@ -192,6 +219,16 @@ function ControlsOverlay({
                                 </span>
                               </button>
                             )}
+
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); updateSettings({ autoRotate: !settings.autoRotate }); }} 
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"
+                            >
+                              <span>Auto Rotate</span>
+                              <span className="text-xs text-zinc-400 font-medium">
+                                {settings.autoRotate ? 'On' : 'Off'}
+                              </span>
+                            </button>
 
                             <button 
                               onClick={(e) => { e.stopPropagation(); setCurrentMenu('speed'); }} 
@@ -695,22 +732,50 @@ export function Player() {
     setAspectRatio('contain');
   }, [currentChannel]);
 
-  const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent) => {
+  const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent, forceRotate?: boolean) => {
     e?.stopPropagation();
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch(err => console.error(err));
       setIsFullscreen(true);
+      
+      // Auto rotate mobile devices to landscape on fullscreen
+      if ((settings.autoRotate || forceRotate) && window.screen && window.screen.orientation && window.screen.orientation.lock) {
+        window.screen.orientation.lock("landscape").catch((err) => {
+          console.warn("Screen orientation lock failed:", err);
+        });
+      }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       }
       setIsFullscreen(false);
+      
+      // Unlock orientation back to default sensor mode
+      if (window.screen && window.screen.orientation && window.screen.orientation.unlock) {
+        try {
+          window.screen.orientation.unlock();
+        } catch (err) {
+          console.warn("Screen orientation unlock failed:", err);
+        }
+      }
     }
   };
 
   useEffect(() => {
-    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    const handleFullscreenChange = () => {
+      const activeFs = !!document.fullscreenElement;
+      setIsFullscreen(activeFs);
+      
+      // Release orientation lock if exiting fullscreen through browser buttons
+      if (!activeFs && window.screen && window.screen.orientation && window.screen.orientation.unlock) {
+        try {
+          window.screen.orientation.unlock();
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+    };
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     
     // Add "F" global keydown shortcut
