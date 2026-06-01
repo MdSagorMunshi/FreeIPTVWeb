@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X, Settings, ShieldAlert, Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -35,10 +35,15 @@ function ControlsOverlay({
   qualities,
   currentQuality,
   setCurrentQuality,
-  containerRef
+  containerRef,
+  playbackSpeed,
+  setPlaybackSpeed,
+  aspectRatio,
+  setAspectRatio
 }: any) {
   const [showControls, setShowControls] = useState(true);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [currentMenu, setCurrentMenu] = useState<'main' | 'quality' | 'speed' | 'aspect'>('main');
   const hideControlsTimeout = useRef<NodeJS.Timeout>(null);
   const { t } = useTranslation();
 
@@ -55,6 +60,13 @@ function ControlsOverlay({
     return () => { if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current); };
   }, [isPlaying, showVpnPopup, showSettings, showVolumeSlider]);
 
+  // Reset menu back to main when settings panel is hidden
+  useEffect(() => {
+    if (!showSettings) {
+      setCurrentMenu('main');
+    }
+  }, [showSettings]);
+
   return (
     <div 
       className="absolute inset-0 z-10"
@@ -63,7 +75,13 @@ function ControlsOverlay({
       onClick={(e) => { 
         handleMouseMove(); 
         if (showSettings) { e.stopPropagation(); setShowSettings(false); } 
-        else togglePlay(e); 
+        else {
+          if (e.detail === 2) {
+            toggleFullscreen(e);
+          } else {
+            togglePlay(e);
+          }
+        }
       }}
     >
       {/* Buffering Indicator */}
@@ -143,24 +161,142 @@ function ControlsOverlay({
               </div>
               
               <div className="flex items-center gap-2.5 relative">
-                {qualities && qualities.length > 0 && (
-                  <div className="relative">
-                    <button onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }} className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 ${showSettings ? 'bg-white/20 text-white' : 'bg-white/5 text-white hover:bg-white/15'}`}>
-                      <Settings size={16} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
-                    </button>
-                    <AnimatePresence>
-                      {showSettings && (
-                        <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full right-0 mb-3.5 w-44 bg-zinc-950/85 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 shadow-[0_16px_48px_rgba(0,0,0,0.8)] overflow-hidden">
-                          <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2">Quality</div>
-                          <button onClick={() => setCurrentQuality(-1)} className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>Auto</span>{currentQuality === -1 && <Check size={14} className="text-primary" />}</button>
-                          {qualities.map((level: any, i: number) => (
-                            <button key={i} onClick={() => setCurrentQuality(i)} className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"><span>{level.height}p</span>{currentQuality === i && <Check size={14} className="text-primary" />}</button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
+                <div className="relative">
+                  <button onClick={(e) => { e.stopPropagation(); setShowSettings(!showSettings); }} className={`p-2.5 rounded-full transition-all backdrop-blur-xl border border-white/5 ${showSettings ? 'bg-white/20 text-white' : 'bg-white/5 text-white hover:bg-white/15'}`}>
+                    <Settings size={16} className={showSettings ? 'rotate-90 transition-transform' : 'transition-transform'} />
+                  </button>
+                  <AnimatePresence>
+                    {showSettings && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }} 
+                        animate={{ opacity: 1, y: 0, scale: 1 }} 
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }} 
+                        className="absolute bottom-full right-0 mb-3.5 w-48 bg-zinc-950/85 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 shadow-[0_16px_48px_rgba(0,0,0,0.8)] overflow-hidden"
+                      >
+                        {/* MAIN SETTINGS MENU */}
+                        {currentMenu === 'main' && (
+                          <div className="flex flex-col gap-0.5">
+                            <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-1.5 border-b border-white/5 mb-1">
+                              Settings
+                            </div>
+                            
+                            {qualities && qualities.length > 0 && (
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); setCurrentMenu('quality'); }} 
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"
+                              >
+                                <span>Quality</span>
+                                <span className="text-xs text-zinc-400 flex items-center gap-1 font-medium">
+                                  {currentQuality === -1 ? 'Auto' : `${qualities[currentQuality]?.height}p`}
+                                  <ChevronRight size={14} />
+                                </span>
+                              </button>
+                            )}
+
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setCurrentMenu('speed'); }} 
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"
+                            >
+                              <span>Speed</span>
+                              <span className="text-xs text-zinc-400 flex items-center gap-1 font-medium">
+                                {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}
+                                <ChevronRight size={14} />
+                              </span>
+                            </button>
+
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setCurrentMenu('aspect'); }} 
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold hover:bg-white/10 transition-colors text-white"
+                            >
+                              <span>Aspect</span>
+                              <span className="text-xs text-zinc-400 flex items-center gap-1 font-medium">
+                                {aspectRatio === 'contain' ? 'Fit' : aspectRatio === 'fill' ? 'Stretch' : 'Zoom'}
+                                <ChevronRight size={14} />
+                              </span>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* QUALITY SUB-MENU */}
+                        {currentMenu === 'quality' && (
+                          <div className="flex flex-col gap-0.5 max-h-48 overflow-y-auto scrollbar-hide">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setCurrentMenu('main'); }} 
+                              className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2 hover:text-white transition-colors border-b border-white/5 mb-1"
+                            >
+                              <ChevronLeft size={14} /> Back
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setCurrentQuality(-1); setShowSettings(false); }} 
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold hover:bg-white/10 transition-colors text-white"
+                            >
+                              <span>Auto</span>
+                              {currentQuality === -1 && <Check size={14} className="text-primary" />}
+                            </button>
+                            {qualities.map((level: any, i: number) => (
+                              <button 
+                                key={i} 
+                                onClick={(e) => { e.stopPropagation(); setCurrentQuality(i); setShowSettings(false); }} 
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold hover:bg-white/10 transition-colors text-white"
+                              >
+                                <span>{level.height}p</span>
+                                {currentQuality === i && <Check size={14} className="text-primary" />}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* SPEED SUB-MENU */}
+                        {currentMenu === 'speed' && (
+                          <div className="flex flex-col gap-0.5">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setCurrentMenu('main'); }} 
+                              className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2 hover:text-white transition-colors border-b border-white/5 mb-1"
+                            >
+                              <ChevronLeft size={14} /> Back
+                            </button>
+                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speedVal) => (
+                              <button 
+                                key={speedVal} 
+                                onClick={(e) => { e.stopPropagation(); setPlaybackSpeed(speedVal); setShowSettings(false); }} 
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold hover:bg-white/10 transition-colors text-white"
+                              >
+                                <span>{speedVal === 1 ? 'Normal' : `${speedVal}x`}</span>
+                                {playbackSpeed === speedVal && <Check size={14} className="text-primary" />}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* ASPECT RATIO SUB-MENU */}
+                        {currentMenu === 'aspect' && (
+                          <div className="flex flex-col gap-0.5">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setCurrentMenu('main'); }} 
+                              className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-3 py-2 hover:text-white transition-colors border-b border-white/5 mb-1"
+                            >
+                              <ChevronLeft size={14} /> Back
+                            </button>
+                            {[
+                              { val: 'contain', label: 'Fit (Default)' },
+                              { val: 'fill', label: 'Stretch' },
+                              { val: 'cover', label: 'Zoom (Crop)' }
+                            ].map((aspect) => (
+                              <button 
+                                key={aspect.val} 
+                                onClick={(e) => { e.stopPropagation(); setAspectRatio(aspect.val); setShowSettings(false); }} 
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold hover:bg-white/10 transition-colors text-white"
+                              >
+                                <span>{aspect.label}</span>
+                                {aspectRatio === aspect.val && <Check size={14} className="text-primary" />}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
                 <button onClick={toggleFullscreen} className="p-2.5 text-white hover:bg-white/15 rounded-full transition-all backdrop-blur-xl bg-white/5 border border-white/5">
                   {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
                 </button>
@@ -176,7 +312,17 @@ function ControlsOverlay({
 /* -------------------------------------------------------------------------- */
 /*                                HLS.js ENGINE                               */
 /* -------------------------------------------------------------------------- */
-function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
+function HlsEngine({ 
+  currentChannel, 
+  containerRef, 
+  toggleFullscreen, 
+  isFullscreen, 
+  closePlayer,
+  playbackSpeed,
+  setPlaybackSpeed,
+  aspectRatio,
+  setAspectRatio
+}: any) {
   const { settings, updateSettings } = usePlayerStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -255,6 +401,13 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
     };
   }, [currentChannel, settings.autoPlay]);
 
+  // Sync playback speed
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = playbackSpeed;
+    }
+  }, [playbackSpeed, isPlaying, currentChannel]);
+
   const togglePlay = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!videoRef.current) return;
@@ -284,7 +437,7 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
 
   return (
     <div className="absolute inset-0 bg-black">
-      <video ref={videoRef} className="w-full h-full object-contain" playsInline />
+      <video ref={videoRef} className={`w-full h-full object-${aspectRatio}`} playsInline />
       <ControlsOverlay
         currentChannel={currentChannel} closePlayer={closePlayer}
         isFullscreen={isFullscreen} toggleFullscreen={toggleFullscreen}
@@ -296,6 +449,8 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
         showSettings={showSettings} setShowSettings={setShowSettings}
         qualities={qualities} currentQuality={currentQuality} setCurrentQuality={handleQualityChange}
         containerRef={containerRef}
+        playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed}
+        aspectRatio={aspectRatio} setAspectRatio={setAspectRatio}
       />
     </div>
   );
@@ -304,7 +459,17 @@ function HlsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscree
 /* -------------------------------------------------------------------------- */
 /*                            REACT-PLAYER ENGINE                             */
 /* -------------------------------------------------------------------------- */
-function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
+function ReactPlayerEngine({ 
+  currentChannel, 
+  containerRef, 
+  toggleFullscreen, 
+  isFullscreen, 
+  closePlayer,
+  playbackSpeed,
+  setPlaybackSpeed,
+  aspectRatio,
+  setAspectRatio
+}: any) {
   const { settings, updateSettings } = usePlayerStore();
   const playerRef = useRef<any>(null);
   
@@ -316,6 +481,7 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
 
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Expose bundled Hls.js globally so ReactPlayer doesn't try to fetch it from a CDN
   useEffect(() => {
@@ -359,6 +525,7 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
         playing={isPlaying}
         volume={volume}
         muted={isMuted}
+        playbackRate={playbackSpeed}
         controls={false} // Disable ugly native controls
         width="100%" 
         height="100%" 
@@ -375,7 +542,7 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
         config={{
           file: {
             forceHLS: true,
-            attributes: { style: { width: '100%', height: '100%', objectFit: 'contain' } }
+            attributes: { style: { width: '100%', height: '100%', objectFit: aspectRatio } }
           }
         } as any}
       />
@@ -387,7 +554,10 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
         volume={volume} setVolume={handleVolumeChange}
         isBuffering={isBuffering}
         showVpnPopup={showVpnPopup} setShowVpnPopup={setShowVpnPopup}
+        showSettings={showSettings} setShowSettings={setShowSettings}
         qualities={[]} 
+        playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed}
+        aspectRatio={aspectRatio} setAspectRatio={setAspectRatio}
       />
     </div>
   );
@@ -396,7 +566,17 @@ function ReactPlayerEngine({ currentChannel, containerRef, toggleFullscreen, isF
 /* -------------------------------------------------------------------------- */
 /*                              VIDEO.JS ENGINE                               */
 /* -------------------------------------------------------------------------- */
-function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFullscreen, closePlayer }: any) {
+function VideoJsEngine({ 
+  currentChannel, 
+  containerRef, 
+  toggleFullscreen, 
+  isFullscreen, 
+  closePlayer,
+  playbackSpeed,
+  setPlaybackSpeed,
+  aspectRatio,
+  setAspectRatio
+}: any) {
   const { settings, updateSettings } = usePlayerStore();
   const placeholderRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
@@ -409,6 +589,7 @@ function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFulls
 
   const [isBuffering, setIsBuffering] = useState(true);
   const [showVpnPopup, setShowVpnPopup] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (!placeholderRef.current) return;
@@ -419,7 +600,7 @@ function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFulls
     videoElement.classList.add('video-js', 'vjs-default-skin');
     videoElement.style.width = '100%';
     videoElement.style.height = '100%';
-    videoElement.style.objectFit = 'contain';
+    videoElement.style.objectFit = aspectRatio;
     videoElement.setAttribute('playsinline', 'true');
     
     placeholderRef.current.appendChild(videoElement);
@@ -446,7 +627,14 @@ function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFulls
         playerRef.current.dispose();
       }
     };
-  }, [currentChannel, settings.autoPlay]);
+  }, [currentChannel, settings.autoPlay, aspectRatio]);
+
+  // Sync playback speed
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current.playbackRate(playbackSpeed);
+    }
+  }, [playbackSpeed, isPlaying, currentChannel]);
 
   const togglePlay = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -482,7 +670,10 @@ function VideoJsEngine({ currentChannel, containerRef, toggleFullscreen, isFulls
         volume={volume} setVolume={handleVolumeChange}
         isBuffering={isBuffering}
         showVpnPopup={showVpnPopup} setShowVpnPopup={setShowVpnPopup}
+        showSettings={showSettings} setShowSettings={setShowSettings}
         qualities={[]}
+        playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed}
+        aspectRatio={aspectRatio} setAspectRatio={setAspectRatio}
       />
     </div>
   );
@@ -495,15 +686,25 @@ export function Player() {
   const { currentChannel, setCurrentChannel, settings } = usePlayerStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [aspectRatio, setAspectRatio] = useState('contain');
 
-  const toggleFullscreen = (e?: React.MouseEvent) => {
+  // Reset transient settings when currentChannel changes
+  useEffect(() => {
+    setPlaybackSpeed(1);
+    setAspectRatio('contain');
+  }, [currentChannel]);
+
+  const toggleFullscreen = (e?: React.MouseEvent | KeyboardEvent) => {
     e?.stopPropagation();
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch(err => console.error(err));
       setIsFullscreen(true);
     } else {
-      document.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
       setIsFullscreen(false);
     }
   };
@@ -511,8 +712,27 @@ export function Player() {
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
+    
+    // Add "F" global keydown shortcut
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      // Skip if writing in an input, textarea or contenteditable element
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.hasAttribute('contenteditable'))) {
+        return;
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullscreen(e);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreen]);
 
   if (!currentChannel) return null;
 
@@ -545,6 +765,10 @@ export function Player() {
             toggleFullscreen={toggleFullscreen} 
             isFullscreen={isFullscreen} 
             closePlayer={closePlayer} 
+            playbackSpeed={playbackSpeed}
+            setPlaybackSpeed={setPlaybackSpeed}
+            aspectRatio={aspectRatio}
+            setAspectRatio={setAspectRatio}
           />
         )}
         
@@ -555,6 +779,10 @@ export function Player() {
             toggleFullscreen={toggleFullscreen} 
             isFullscreen={isFullscreen} 
             closePlayer={closePlayer} 
+            playbackSpeed={playbackSpeed}
+            setPlaybackSpeed={setPlaybackSpeed}
+            aspectRatio={aspectRatio}
+            setAspectRatio={setAspectRatio}
           />
         )}
         
@@ -565,6 +793,10 @@ export function Player() {
             toggleFullscreen={toggleFullscreen} 
             isFullscreen={isFullscreen} 
             closePlayer={closePlayer} 
+            playbackSpeed={playbackSpeed}
+            setPlaybackSpeed={setPlaybackSpeed}
+            aspectRatio={aspectRatio}
+            setAspectRatio={setAspectRatio}
           />
         )}
       </motion.div>
