@@ -29,8 +29,52 @@
 
 @layer base {
   :root {
-    --bg-background: #F7F8FA;
-    --text-foreground: #111827;
+    --bg-background: var(--color-background);
+    --text-foreground: var(--color-primary-text);
+  }
+
+  [data-theme="dark"] {
+    --color-background: #111827;
+    --color-surface: #1F2937;
+    --color-dark-section: #0B0F19;
+
+    --color-primary-text: #F9FAFB;
+    --color-secondary-text: #D1D5DB;
+    --color-muted-text: #9CA3AF;
+    --color-inverse-text: #111827;
+
+    --color-primary: #3B82F6;
+    --color-primary-hover: #60A5FA;
+    --color-primary-light: #1E3A8A;
+
+    --color-accent: #2DD4BF;
+    --color-accent-hover: #5EEAD4;
+    --color-accent-light: #134E4A;
+
+    --color-border-light: #374151;
+    --color-border-dark: #1F2937;
+  }
+
+  [data-theme="oled"] {
+    --color-background: #000000;
+    --color-surface: #09090B;
+    --color-dark-section: #000000;
+
+    --color-primary-text: #FFFFFF;
+    --color-secondary-text: #D1D5DB;
+    --color-muted-text: #71717A;
+    --color-inverse-text: #000000;
+
+    --color-primary: #3B82F6;
+    --color-primary-hover: #60A5FA;
+    --color-primary-light: #1E3A8A;
+
+    --color-accent: #2DD4BF;
+    --color-accent-hover: #5EEAD4;
+    --color-accent-light: #134E4A;
+
+    --color-border-light: #27272A;
+    --color-border-dark: #18181B;
   }
 
   body {
