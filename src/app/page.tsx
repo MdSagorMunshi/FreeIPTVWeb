@@ -219,6 +219,12 @@ export default function Home() {
           <LoadingIndicator theme="primary" />
         </div>
       )}
+      
+      {filteredChannels.length > 0 && filteredChannels.length <= visibleCount && (
+        <div className="flex justify-center pt-12 pb-8">
+          <p className="text-secondary-text font-bold tracking-[0.2em] uppercase text-sm">End of all channels</p>
+        </div>
+      )}
 
       {filteredChannels.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">

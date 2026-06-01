@@ -11,6 +11,17 @@ export default function About() {
 
   const changelogs = [
     {
+      version: "v1.5.0",
+      date: "June 01, 2026",
+      changes: [
+        "Transformed UI to a professional 'Modern Warm Minimalism' design system.",
+        "Implemented multi-column footer with extensive navigation.",
+        "Added dedicated Privacy Policy, Terms of Service, and FAQ pages.",
+        "Removed neon gradients in favor of clean, structured surfaces.",
+        "Optimized layout consistency and introduced 'End of channels' indicators."
+      ]
+    },
+    {
       version: "v1.4.0",
       date: "May 31, 2026",
       changes: [
@@ -87,15 +98,15 @@ export default function About() {
           </div>
 
           <section className="bg-background rounded-[12px] p-6 md:p-8 border border-border-light mb-6 relative overflow-hidden w-full shadow-sm">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
             
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 relative z-10">
               <div className="flex items-center gap-4 mb-4 sm:mb-0">
                 <img src="/logo.png" alt="FreeIPTV" className="w-16 h-16 rounded-[12px] shadow-sm border border-border-light" />
                 <div>
                   <h2 className="text-2xl font-bold text-primary-text">FreeIPTV Web</h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-bold px-2 py-1 bg-surface text-primary-text border border-border-light rounded-md">{t('about.version')} 1.4.0</span>
+                    <span className="text-xs font-bold px-2 py-1 bg-surface text-primary-text border border-border-light rounded-md">{t('about.version')} 1.5.0</span>
                     <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md">{t('about.engine')} HLS Core</span>
                   </div>
                 </div>
@@ -103,19 +114,19 @@ export default function About() {
               
               <button 
                 onClick={() => setIsChangelogOpen(true)}
-                className="px-4 py-2 bg-surface hover:bg-background text-primary-text rounded-[8px] border border-border-light transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
+                className="px-4 py-2 bg-surface hover:bg-background text-primary-text rounded-[8px] border border-border-light transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm cursor-pointer z-20"
               >
                 <FileText size={16} />
                 {t('about.changelogs')}
               </button>
             </div> 
-            <p className="text-left text-secondary-text leading-relaxed">
+            <p className="text-left text-secondary-text leading-relaxed relative z-10">
               FreeIPTV Web is a modern, lag-less live TV streaming application designed from the ground up for the ultimate viewing experience. 
               Built with Next.js 16, TypeScript, and Framer Motion, it brings the robustness of our Android app straight to your browser with an unparalleled aesthetic.
             </p>
           </section>
 
-          <div className="flex flex-wrap justify-center items-center gap-4">
+          <div className="flex flex-wrap justify-center items-center gap-4 relative z-10">
             <a href="http://github.com/MdSagorMunshi/FreeIPTVWeb" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-surface hover:bg-background border border-border-light transition-colors text-primary-text" title="FOSS Repository">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-text"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
             </a>
@@ -134,7 +145,7 @@ export default function About() {
         className="max-w-2xl w-full mt-6"
       >
         <section className="relative w-full rounded-[12px] overflow-hidden border border-border-light bg-surface p-6 md:p-8 shadow-sm">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
             <div className="flex-1 text-center md:text-left">
