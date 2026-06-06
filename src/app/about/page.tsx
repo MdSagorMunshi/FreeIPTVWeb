@@ -11,6 +11,14 @@ export default function About() {
 
   const changelogs = [
     {
+      version: "v1.6.1",
+      date: "June 06, 2026",
+      changes: [
+        "Feature: Import custom M3U/M3U8 playlists directly via a URL link on the My Playlists page.",
+        "Added privacy-friendly Vercel Analytics tracking support."
+      ]
+    },
+    {
       version: "v1.6.0",
       date: "June 01, 2026",
       changes: [
@@ -122,7 +130,7 @@ export default function About() {
                 <div>
                   <h2 className="text-2xl font-bold text-primary-text">FreeIPTV Web</h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-bold px-2 py-1 bg-surface text-primary-text border border-border-light rounded-md">{t('about.version')} 1.6.0</span>
+                    <span className="text-xs font-bold px-2 py-1 bg-surface text-primary-text border border-border-light rounded-md">{t('about.version')} 1.6.1</span>
                     <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md">{t('about.engine')} HLS Core</span>
                   </div>
                 </div>
